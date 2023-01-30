@@ -12,6 +12,16 @@
 namespace battle_ship
 {
 
+#define X_START_POINT 0
+#define Y_START_POINT 0
+#define X_BASE 144
+#define Y_BASE 120
+#define SQUARE_SIZE 63
+#define GAP 5
+
+
+using ShipPtr = std::shared_ptr<Ship>;
+
 class Screen
 {
 public:
@@ -32,18 +42,12 @@ private:
     Background m_background;
 
     //need to by deleted
-    std::shared_ptr<Ship> m_ship1;
-    std::shared_ptr<Ship> m_ship2;
-    std::shared_ptr<Ship> m_ship3;
-    std::shared_ptr<Ship> m_ship4;
-    std::shared_ptr<Ship> m_ship5;
-    std::shared_ptr<Ship> m_ship6;
-    std::shared_ptr<Ship> m_ship7;
-    std::shared_ptr<Ship> m_ship8;
-    std::shared_ptr<Ship> m_ship9;
-    std::shared_ptr<Ship> m_ship10;
-    std::shared_ptr<Ship> m_ship11;
-    std::shared_ptr<Ship> m_ship12;
+    ShipPtr m_ship1;
+    ShipPtr m_ship4;
+    ShipPtr m_ship8;
+    ShipPtr m_ship9;
+    ShipPtr m_ship10;
+    ShipPtr m_ship11;
 };
 
 

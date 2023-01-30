@@ -19,10 +19,18 @@ public:
     int x();
     int y();
     int size();
+    int length();
+    int width();
+    int right()const;
+    int left()const;
+    int top()const;
+    int bottom()const;
     bool is_located();
     bool direction();
     void set_point(int x, int y);
+    void set_position(int x, int y);
     void set_located(bool status);
+    bool is_in_range(int x, int y);
     void draw(sf::RenderWindow& a_window)const;
 
 private:

@@ -6,10 +6,6 @@
 namespace battle_ship
 {
 
-#define X_BASE 135
-#define Y_BASE 95
-#define SQUARE_SIZE 63
-
 class Background 
 {
 public:
