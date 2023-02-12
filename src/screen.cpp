@@ -4,6 +4,7 @@ namespace battle_ship
 {
 
 bool mouse_press_on_ship = false;
+bool ships_location_phase = true;
 
 namespace impl
 {
@@ -29,54 +30,48 @@ int mouse_y_position(sf::RenderWindow& window)
     return position.y;
 }
 
-bool is_mouse_pressed_on_the_ship(ShipPtr& ship, int x, int y)
+void center_the_ship_on_the_mouse(ShipManager& ship_manager, int i, bool direction, int x, int y)
 {
-    return sf::Mouse::isButtonPressed(sf::Mouse::Left) && ship.get()->is_in_range(x, y);
+    ship_manager.set_ship_position(i, direction, x - (ship_manager.left(i, direction)/2), y - (ship_manager.width(i, direction)/2));
 }
 
-void center_the_ship_on_the_mouse(ShipPtr& ship, int x, int y)
-{
-    ship.get()->set_position(x - (ship.get()->length()/2), y - (ship.get()->width()/2));
-}
-
-
-bool the_ship_is_off_the_grid_board(ShipPtr& ship)
+bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direction)
 {
     return 
     (
-        ship.get()->left() < X_BASE  - SQUARE_SIZE/2                                 ||
-        ship.get()->right() > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2  ||
-        ship.get()->top() < Y_BASE - SQUARE_SIZE/2                                   ||
-        ship.get()->bottom() > Y_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
+        ship_manager.left(i, direction) < X_BASE  - SQUARE_SIZE/2                                 ||
+        ship_manager.right(i, direction) > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2  ||
+        ship_manager.top(i, direction) < Y_BASE - SQUARE_SIZE/2                                   ||
+        ship_manager.bottom(i, direction) > Y_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
     );
 }
 
-int x(ShipPtr& ship)
+int x(ShipManager& ship_manager, int i, bool direction)
 {
-    return ship.get()->left() - (ship.get()->left() - X_BASE)%SQUARE_SIZE;
+    return ship_manager.left(i, direction) - (ship_manager.left(i, direction) - X_BASE)%SQUARE_SIZE;
 }
 
-int y(ShipPtr& ship)
+int y(ShipManager& ship_manager, int i, bool direction)
 {
-    if(ship.get()->top() < Y_BASE)
+    if(ship_manager.top(i, direction) < Y_BASE)
     {
-        if(ship.get()->bottom() > Y_BASE)
-            return  Y_BASE + (SQUARE_SIZE - ship.get()->width()) + GAP;
+        if(ship_manager.bottom(i, direction) > Y_BASE)
+            return  Y_BASE + (SQUARE_SIZE - ship_manager.width(i, direction)) + GAP;
         else    
-          return  ship.get()->top();
+          return  ship_manager.top(i, direction);
     }
     else
     {
-        return ship.get()->top() + (SQUARE_SIZE - (ship.get()->top() - (Y_BASE + GAP))%SQUARE_SIZE) + (SQUARE_SIZE - ship.get()->width());
+        return ship_manager.top(i, direction) + (SQUARE_SIZE - (ship_manager.top(i, direction) - (Y_BASE + GAP))%SQUARE_SIZE) + (SQUARE_SIZE - ship_manager.width(i, direction));
     }
 }
 
-void set_ship_position(ShipPtr& ship)
+void set_ship_position(int i, bool direction, ShipManager& ship_manager)
 {
-    ship.get()->set_position(x(ship) + GAP, y(ship) - GAP);
+    ship_manager.set_ship_position(i, direction, x(ship_manager, i, direction) + GAP, y(ship_manager, i, direction) - GAP);
 
-    if(the_ship_is_off_the_grid_board(ship))
-        ship.get()->set_position(X_START_POINT, Y_START_POINT);
+    if(the_ship_is_off_the_grid_board(ship_manager, i, direction))
+        ship_manager.set_ship_position(i, direction, X_START_POINT, Y_START_POINT);
 }
 
 
@@ -85,14 +80,6 @@ void set_ship_position(ShipPtr& ship)
 
 Screen::Screen()
 : m_window(sf::VideoMode::getDesktopMode(), "Battleship")
-
-//need to by deleted
-, m_ship1 (new Ship("resources/images/1.png", 4, 206,  182, 0.85, HORIZONTAL))
-, m_ship4 (new Ship("resources/images/2.png", 3, 340,  445, 0.95,  HORIZONTAL))
-, m_ship8 (new Ship("resources/images/3.png",   4, 240,  565, 0.49, VERTICAL))
-, m_ship9 (new Ship("resources/images/4.png",   3, 215, 375, 0.65,  VERTICAL))
-, m_ship10(new Ship("resources/images/5.png",   3, 820, 183, 1.15,  VERTICAL))
-, m_ship11(new Ship("resources/images/6.png",   2, 820, 570, 0.85,  VERTICAL))
 {
     m_thread = new std::thread(impl::thread_function, this);
 }
@@ -111,14 +98,7 @@ void Screen::stop()
 void Screen::draw_all()
 {
     m_background.draw(m_window);
-
-    //need to by deleted
-    m_ship1.get()->draw(m_window);
-    m_ship4.get()->draw(m_window);
-    m_ship8.get()->draw(m_window);
-    m_ship9.get()->draw(m_window);
-    m_ship10.get()->draw(m_window);
-    m_ship11.get()->draw(m_window);
+    m_ships_manager.print_ship(0, 0, m_window);
 }
 
 void Screen::check_mouse()
@@ -128,7 +108,7 @@ void Screen::check_mouse()
 
     if(!mouse_press_on_ship)
     {
-        if(impl::is_mouse_pressed_on_the_ship(m_ship11, x, y))
+        if(m_ships_manager.is_mouse_pressed_on_the_ship(0, 0, x, y))
             mouse_press_on_ship = true;
     }
     else
@@ -136,11 +116,11 @@ void Screen::check_mouse()
         if(!sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             mouse_press_on_ship = false;
-            impl::set_ship_position(m_ship11);
+            impl::set_ship_position(0, 0, m_ships_manager);
         }
         else
         {
-            impl::center_the_ship_on_the_mouse(m_ship11, x, y);
+            impl::center_the_ship_on_the_mouse(m_ships_manager, 0, 0, x, y);
         }
     }
 }
@@ -160,7 +140,7 @@ void Screen::check_events()
     }
 }
 
-void Screen::run()
+void Screen::ships_location_phase_loop()
 {
     while(m_window.isOpen())
     {
@@ -170,6 +150,12 @@ void Screen::run()
         check_events();
         m_window.display();
     }
+}
+
+void Screen::run()
+{
+    ships_location_phase_loop();
+    //game_phase_loop();
 }
 
 

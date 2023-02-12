@@ -1,13 +1,13 @@
 #pragma once
 
 #include <thread>
-#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include <SFML/Graphics.hpp>
 
 #include "ship.hpp"
 #include "background.hpp"
+#include "ships_manager.hpp"
 
 namespace battle_ship
 {
@@ -18,9 +18,6 @@ namespace battle_ship
 #define Y_BASE 120
 #define SQUARE_SIZE 63
 #define GAP 5
-
-
-using ShipPtr = std::shared_ptr<Ship>;
 
 class Screen
 {
@@ -33,6 +30,8 @@ public:
     void draw_all();
     void check_mouse();
     void check_events();
+    void ships_location_phase_loop();
+
 
 private:
     sf::Event m_event;
@@ -40,14 +39,7 @@ private:
 
     std::thread* m_thread;
     Background m_background;
-
-    //need to by deleted
-    ShipPtr m_ship1;
-    ShipPtr m_ship4;
-    ShipPtr m_ship8;
-    ShipPtr m_ship9;
-    ShipPtr m_ship10;
-    ShipPtr m_ship11;
+    ShipManager m_ships_manager;
 };
 
 
