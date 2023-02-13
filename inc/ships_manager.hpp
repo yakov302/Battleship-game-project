@@ -11,6 +11,7 @@ namespace battle_ship
 {
 
 #define NUM_OF_SHIPS 6
+#define SHIPS_IMAGES_FOLDER "resources/images/"
 
 using ShipPtr = std::shared_ptr<Ship>;
 using ShipsMap = std::unordered_map<int, ShipPtr>;
@@ -19,9 +20,6 @@ class ShipManager
 {
 public:
     ShipManager();
-    void set_ship_position(int i, bool direction, int x, int y);
-    void print_ship(int i, bool direction, sf::RenderWindow& window);
-    bool is_mouse_pressed_on_the_ship(int i, bool direction, int x, int y);
 
     int left(int i, bool direction);
     int right (int i, bool direction);
@@ -30,9 +28,17 @@ public:
     int width(int i, bool direction);
     int length (int , bool direction);
 
+    void locate_ship(int i, bool direction);
+    bool is_ship_located(int i, bool direction);
+    void draw_located_ships(sf::RenderWindow& window);
+    void set_ship_position(int i, bool direction, int x, int y);
+    void draw_ship(int i, bool direction, sf::RenderWindow& window);
+    bool is_mouse_pressed_on_the_ship(int i, bool direction, int x, int y);
+
 private:
     ShipsMap m_vertical;
     ShipsMap m_horizontal;
+    ShipsMap m_locate_ships;
 };
 
 

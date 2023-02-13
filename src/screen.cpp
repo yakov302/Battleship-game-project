@@ -3,6 +3,8 @@
 namespace battle_ship
 {
 
+int ship_index = 0;
+bool ship_direction = HORIZONTAL;
 bool mouse_press_on_ship = false;
 bool ships_location_phase = true;
 
@@ -39,9 +41,9 @@ bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direc
 {
     return 
     (
-        ship_manager.left(i, direction) < X_BASE  - SQUARE_SIZE/2                                 ||
-        ship_manager.right(i, direction) > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2  ||
-        ship_manager.top(i, direction) < Y_BASE - SQUARE_SIZE/2                                   ||
+        ship_manager.left(i, direction)   < X_BASE - SQUARE_SIZE/2                                 ||
+        ship_manager.right(i, direction)  > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2  ||
+        ship_manager.top(i, direction)    < Y_BASE - SQUARE_SIZE/2                                 ||
         ship_manager.bottom(i, direction) > Y_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
     );
 }
@@ -66,12 +68,21 @@ int y(ShipManager& ship_manager, int i, bool direction)
     }
 }
 
-void set_ship_position(int i, bool direction, ShipManager& ship_manager)
+void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager)
 {
+    mouse_press_on_ship = false;
     ship_manager.set_ship_position(i, direction, x(ship_manager, i, direction) + GAP, y(ship_manager, i, direction) - GAP);
 
     if(the_ship_is_off_the_grid_board(ship_manager, i, direction))
+    {
         ship_manager.set_ship_position(i, direction, X_START_POINT, Y_START_POINT);
+    }
+    else
+    {
+        ship_manager.locate_ship(ship_index, ship_direction);
+        ship_direction = HORIZONTAL;
+        ++ship_index;
+    }
 }
 
 
@@ -95,34 +106,47 @@ void Screen::stop()
     m_window.close();
 }
 
-void Screen::draw_all()
+void Screen::draw_locate()
 {
     m_background.draw(m_window);
-    m_ships_manager.print_ship(0, 0, m_window);
+    m_ships_manager.draw_located_ships(m_window);
+    m_ships_manager.draw_ship(ship_index, ship_direction, m_window);
 }
 
-void Screen::check_mouse()
+void Screen::draw_game()
+{
+    m_background.draw(m_window);
+    m_ships_manager.draw_located_ships(m_window);
+}
+
+void Screen::check_mouse_locate()
 { 
     int x = impl::mouse_x_position(m_window);
     int y = impl::mouse_y_position(m_window);
 
-    if(!mouse_press_on_ship)
+    if(mouse_press_on_ship)
     {
-        if(m_ships_manager.is_mouse_pressed_on_the_ship(0, 0, x, y))
-            mouse_press_on_ship = true;
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            impl::center_the_ship_on_the_mouse(m_ships_manager, ship_index, ship_direction, x, y);
+        else
+            impl::set_ship_on_bord(ship_index, ship_direction, m_ships_manager);
     }
     else
     {
-        if(!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        {
-            mouse_press_on_ship = false;
-            impl::set_ship_position(0, 0, m_ships_manager);
-        }
-        else
-        {
-            impl::center_the_ship_on_the_mouse(m_ships_manager, 0, 0, x, y);
-        }
+        if(m_ships_manager.is_mouse_pressed_on_the_ship(ship_index, ship_direction, x, y))
+            mouse_press_on_ship = true;
     }
+
+    if(m_background.is_change_direction_button_pressed(x, y))
+    {
+        ship_direction = !ship_direction;
+        usleep(100000);
+    }
+}
+
+void Screen::check_mouse_game()
+{ 
+
 }
 
 void Screen::check_events()
@@ -140,13 +164,27 @@ void Screen::check_events()
     }
 }
 
-void Screen::ships_location_phase_loop()
+void Screen::locate_loop()
+{
+    while(m_window.isOpen() && ship_index < NUM_OF_SHIPS)
+    {
+        m_window.clear();
+        draw_locate();
+        check_mouse_locate();
+        check_events();
+        m_window.display();
+    }
+
+    ships_location_phase = false;
+}
+
+void Screen::game_loop()
 {
     while(m_window.isOpen())
     {
         m_window.clear();
-        draw_all();
-        check_mouse();
+        draw_game();
+        check_mouse_game();
         check_events();
         m_window.display();
     }
@@ -154,8 +192,8 @@ void Screen::ships_location_phase_loop()
 
 void Screen::run()
 {
-    ships_location_phase_loop();
-    //game_phase_loop();
+    locate_loop();
+    game_loop();
 }
 
 

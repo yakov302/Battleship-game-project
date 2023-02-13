@@ -1,6 +1,6 @@
-resources/images/1_horizontal.png|4|0|0|0.85|1|
-resources/images/2_horizontal.png|3|0|0|0.95|1|
-resources/images/3_horizontal.png|4|0|0|0.49|1|
-resources/images/4_horizontal.png|3|0|0|0.65|1|
-resources/images/5_horizontal.png|3|0|0|1.15|1|
-resources/images/6_horizontal.png|2|0|0|0.85|1|
+resources/images/0_horizontal.png|4|1550|400|0.85|1|
+resources/images/1_horizontal.png|3|1550|400|0.95|1|
+resources/images/2_horizontal.png|4|1550|400|0.49|1|
+resources/images/3_horizontal.png|3|1550|400|0.65|1|
+resources/images/4_horizontal.png|3|1550|400|1.15|1|
+resources/images/5_horizontal.png|2|1550|400|0.85|1|
