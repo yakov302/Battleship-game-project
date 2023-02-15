@@ -149,7 +149,7 @@ void ShipManager::locate_ship(int i, bool direction)
     else
     {
         m_vertical[i].get()->set_located(ON_BORD);
-        m_locate_ships[i] = m_horizontal[i];
+        m_locate_ships[i] = m_vertical[i];
     }
 }
 

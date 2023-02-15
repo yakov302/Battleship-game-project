@@ -34,7 +34,7 @@ int mouse_y_position(sf::RenderWindow& window)
 
 void center_the_ship_on_the_mouse(ShipManager& ship_manager, int i, bool direction, int x, int y)
 {
-    ship_manager.set_ship_position(i, direction, x - (ship_manager.left(i, direction)/2), y - (ship_manager.width(i, direction)/2));
+    ship_manager.set_ship_position(i, direction, x - (ship_manager.length(i, direction)/2), y - (ship_manager.width(i, direction)/2));
 }
 
 bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direction)
@@ -140,7 +140,7 @@ void Screen::check_mouse_locate()
     if(m_background.is_change_direction_button_pressed(x, y))
     {
         ship_direction = !ship_direction;
-        usleep(100000);
+        usleep(250000);
     }
 }
 
