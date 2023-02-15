@@ -12,11 +12,8 @@ namespace battle_ship
 {
 
 #define GAP 5
-#define X_BASE 144
-#define Y_BASE 120
 #define X_START_POINT 1550
 #define Y_START_POINT 400
-#define SQUARE_SIZE 63
 
 class Screen
 {

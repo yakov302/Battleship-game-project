@@ -41,7 +41,7 @@ bool Ship::direction()
 
 void Ship::set_point(int x, int y)
 {
-    m_points.set(x, y, ON_BORD);
+    m_points.set_status(x, y, ON_BORD);
 }
 
 void Ship::set_located(bool status)

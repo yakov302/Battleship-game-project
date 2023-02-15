@@ -5,16 +5,23 @@ namespace battle_ship
 
 namespace impl
 {
-     
-void reset_buffer(int* buffer)
-{
-    for (int i = 0; i < NUM_OF_POINTS; ++i)
-        buffer[i] = 0;
-}
 
 int get_index(int x, int y)
 {
     return NUM_OF_COLUMNS*x + y;
+}
+   
+void init_matrix(Square* buffer)
+{
+    for(int i = 0; i < NUM_OF_COLUMNS; ++i)
+    {
+        for(int j = 0; j < NUM_OF_COLUMNS; ++j)
+        {
+            buffer[get_index(i, j)].x = X_BASE + SQUARE_SIZE*j;
+            buffer[get_index(i, j)].y = Y_BASE + SQUARE_SIZE*i;
+            buffer[get_index(i, j)].status = 0;
+        }
+    }
 }
 
 int is_index_inside_matrix_range(int index)
@@ -24,26 +31,66 @@ int is_index_inside_matrix_range(int index)
     return true;
 }
 
+int is_point_inside_matrix_range(int x, int y)
+{
+    if(x < X_BASE || y <  Y_BASE || x > X_BASE + SQUARE_SIZE*NUM_OF_COLUMNS || y > Y_BASE + SQUARE_SIZE*NUM_OF_COLUMNS)
+        return false;
+    return true;
+}
+
 
 }//impl namespace
 
 Matrix::Matrix()
 {
-    impl::reset_buffer(m_matrix);
+    impl::init_matrix(m_matrix);
 }
 
-int Matrix::get(int x, int y)
+int Matrix::get_status(int x, int y)
 {
     int index = impl::get_index(x, y);
     assert(impl::is_index_inside_matrix_range(index));
-    return m_matrix[index];
+    return m_matrix[index].status;
 }
 
-void Matrix::set(int x, int y, int value)
+void Matrix::set_status(int x, int y, int value)
 {
     int index = impl::get_index(x, y);
     assert(impl::is_index_inside_matrix_range(index));
-    m_matrix[index] = value;
+    m_matrix[index].status = value;
+}
+
+int Matrix::give_index(int x, int y)
+{
+    assert(impl::is_point_inside_matrix_range(x, y));
+
+    for(int i = 0; i < NUM_OF_COLUMNS; ++i)
+    {
+        for(int j = 0; j < NUM_OF_COLUMNS; ++j)
+        {
+            if(y >= give_y(impl::get_index(i, j)) + SQUARE_SIZE)
+                break;
+            
+            if(x >= give_x(impl::get_index(i, j)) + SQUARE_SIZE)
+                continue;
+            
+            return impl::get_index(i, j);
+        }
+    }
+
+    return 1;
+}
+
+int Matrix::give_x(int index)
+{
+    assert(impl::is_index_inside_matrix_range(index));
+    return m_matrix[index].x;
+}
+
+int Matrix::give_y(int index)
+{
+    assert(impl::is_index_inside_matrix_range(index));
+    return m_matrix[index].y;
 }
 
 std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix)
@@ -51,7 +98,11 @@ std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix)
     for(int i = 0; i < NUM_OF_COLUMNS; ++i)
     {
         for(int j = 0; j < NUM_OF_COLUMNS; ++j)
-            std::cout << matrix.m_matrix[NUM_OF_COLUMNS*i + j] << " ";
+        {
+            std::cout << matrix.m_matrix[NUM_OF_COLUMNS*i + j].x      << ","
+                      << matrix.m_matrix[NUM_OF_COLUMNS*i + j].y      << ","
+                      << matrix.m_matrix[NUM_OF_COLUMNS*i + j].status << "  ";
+        }
         std::cout << std::endl;
     }
 
