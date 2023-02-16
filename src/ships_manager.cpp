@@ -16,6 +16,11 @@ std::string next_slice_from_line(std::string& config_data)
     return config_data.substr(begine, end-begine);
 }
 
+void set_position(ShipPtr& ship)
+{
+    ship.get()->set_position(X_START_POINT - ship.get()->length()/2, Y_START_POINT);
+}
+
 void load_ship(ShipsMap& map, std::string& config_data, int i)
 {
     end = -1;
@@ -29,6 +34,7 @@ void load_ship(ShipsMap& map, std::string& config_data, int i)
     bool direction = std::stoi(next_slice_from_line(config_data));
    
     map[i] = ShipPtr(new Ship(image_path, size, x_pos, y_pos, scale, direction));
+    set_position(map[i]);
 }
 
 void load_ships(ShipsMap& map, std::ifstream& config_file)
@@ -137,6 +143,14 @@ int ShipManager::length (int i, bool direction)
         return m_horizontal[i].get()->length();
     else
         return m_vertical[i].get()->length(); 
+}
+
+int ShipManager::size (int i, bool direction)
+{
+    if(direction == HORIZONTAL)
+        return m_horizontal[i].get()->size();
+    else
+        return m_vertical[i].get()->size(); 
 }
 
 void ShipManager::locate_ship(int i, bool direction)

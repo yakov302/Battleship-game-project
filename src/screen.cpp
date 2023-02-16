@@ -48,41 +48,51 @@ bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direc
     );
 }
 
-int x(ShipManager& ship_manager, int i, bool direction)
+std::pair<int, int> set_point(ShipManager& ship_manager, Matrix& matrix, int i, bool direction)
 {
-    return ship_manager.left(i, direction) - (ship_manager.left(i, direction) - X_BASE)%SQUARE_SIZE;
-}
+    int x = ship_manager.left(i, direction);
+    int y = ship_manager.top(i, direction);
+    if(direction == HORIZONTAL)
+        y += ship_manager.width(i, direction);
 
-int y(ShipManager& ship_manager, int i, bool direction)
-{
-    if(ship_manager.top(i, direction) < Y_BASE)
-    {
-        if(ship_manager.bottom(i, direction) > Y_BASE)
-            return  Y_BASE + (SQUARE_SIZE - ship_manager.width(i, direction)) + GAP;
-        else    
-          return  ship_manager.top(i, direction);
-    }
+    int index = matrix.give_index(x, y);
+    x = matrix.give_x(index);
+    y = matrix.give_y(index);
+
+    int gap;
+    int size = ship_manager.size(i, direction)*SQUARE_SIZE;
+
+    if(direction == HORIZONTAL)
+        gap = size - ship_manager.length(i, direction); 
     else
-    {
-        return ship_manager.top(i, direction) + (SQUARE_SIZE - (ship_manager.top(i, direction) - (Y_BASE + GAP))%SQUARE_SIZE) + (SQUARE_SIZE - ship_manager.width(i, direction));
-    }
+        gap = SQUARE_SIZE - ship_manager.length(i, direction);
+    x = x + gap/2;
+
+    if(direction == HORIZONTAL)
+        gap = SQUARE_SIZE -  ship_manager.width(i, direction);
+    else
+        gap = size - ship_manager.width(i, direction);
+    y = y + gap/2;
+
+    return std::pair<int, int>(x, y);
 }
 
-void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager)
+void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& matrix)
 {
     mouse_press_on_ship = false;
-    ship_manager.set_ship_position(i, direction, x(ship_manager, i, direction) + GAP, y(ship_manager, i, direction) - GAP);
+    std::pair<int, int> point = set_point(ship_manager, matrix, i, direction); 
+    ship_manager.set_ship_position(i, direction, point.first, point.second);
 
     if(the_ship_is_off_the_grid_board(ship_manager, i, direction))
     {
-        ship_manager.set_ship_position(i, direction, X_START_POINT, Y_START_POINT);
+        ship_manager.set_ship_position(i, direction, X_START_POINT - ship_manager.length(i, direction)/2, Y_START_POINT);
     }
     else
     {
         ship_manager.locate_ship(ship_index, ship_direction);
         ship_direction = HORIZONTAL;
         ++ship_index;
-    }
+   }
 }
 
 
@@ -129,7 +139,7 @@ void Screen::check_mouse_locate()
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             impl::center_the_ship_on_the_mouse(m_ships_manager, ship_index, ship_direction, x, y);
         else
-            impl::set_ship_on_bord(ship_index, ship_direction, m_ships_manager);
+            impl::set_ship_on_bord(ship_index, ship_direction, m_ships_manager, m_player_matrix);
     }
     else
     {

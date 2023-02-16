@@ -3,6 +3,7 @@
 #include <thread>
 #include <iostream>
 #include <unistd.h>
+#include <utility>
 #include <SFML/Graphics.hpp>
 
 #include "background.hpp"
@@ -10,10 +11,6 @@
 
 namespace battle_ship
 {
-
-#define GAP 5
-#define X_START_POINT 1550
-#define Y_START_POINT 400
 
 class Screen
 {
@@ -39,6 +36,7 @@ private:
     sf::Event m_event;
     sf::RenderWindow m_window;
 
+    Matrix m_player_matrix;
     Background m_background;
     ShipManager m_ships_manager;
 };

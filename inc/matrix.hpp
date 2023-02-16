@@ -11,6 +11,7 @@ namespace battle_ship
 #define SQUARE_SIZE 63
 #define NUM_OF_COLUMNS 10
 #define NUM_OF_POINTS 100
+#define OUTSIDE_MATRIX_RANGE -1
 
 struct Square
 {

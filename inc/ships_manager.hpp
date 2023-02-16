@@ -11,6 +11,8 @@ namespace battle_ship
 {
 
 #define NUM_OF_SHIPS 6
+#define X_START_POINT 1645
+#define Y_START_POINT 360
 #define SHIPS_IMAGES_FOLDER "resources/images/"
 
 using ShipPtr = std::shared_ptr<Ship>;
@@ -26,7 +28,8 @@ public:
     int top(int i, bool direction); 
     int bottom(int i, bool direction);
     int width(int i, bool direction);
-    int length (int , bool direction);
+    int length (int i, bool direction);
+    int size (int i, bool direction);
 
     void locate_ship(int i, bool direction);
     bool is_ship_located(int i, bool direction);

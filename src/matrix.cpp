@@ -26,6 +26,7 @@ void init_matrix(Square* buffer)
 
 int is_index_inside_matrix_range(int index)
 {
+
     if(index >= NUM_OF_POINTS || index < 0)
         return false;
     return true;
@@ -62,7 +63,8 @@ void Matrix::set_status(int x, int y, int value)
 
 int Matrix::give_index(int x, int y)
 {
-    assert(impl::is_point_inside_matrix_range(x, y));
+    if(! impl::is_point_inside_matrix_range(x, y))
+        return OUTSIDE_MATRIX_RANGE;
 
     for(int i = 0; i < NUM_OF_COLUMNS; ++i)
     {
@@ -78,18 +80,20 @@ int Matrix::give_index(int x, int y)
         }
     }
 
-    return 1;
+    return OUTSIDE_MATRIX_RANGE; //Shouldn't get here
 }
 
 int Matrix::give_x(int index)
 {
-    assert(impl::is_index_inside_matrix_range(index));
+    if(! impl::is_index_inside_matrix_range(index))
+         return OUTSIDE_MATRIX_RANGE;
     return m_matrix[index].x;
 }
 
 int Matrix::give_y(int index)
 {
-    assert(impl::is_index_inside_matrix_range(index));
+    if(! impl::is_index_inside_matrix_range(index))
+         return OUTSIDE_MATRIX_RANGE;
     return m_matrix[index].y;
 }
 

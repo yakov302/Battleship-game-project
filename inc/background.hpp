@@ -15,10 +15,10 @@ public:
     : m_ackground("resources/images/background.jpg", 0, 0, 1)
     , m_grid_board_player("resources/images/grid_board.png", 140, 110, 1.3)
     , m_grid_board_rival("resources/images/grid_board.png", 810, 110, 1.3)
-    , m_change_direction_button("resources/images/change_direction_button.png", 1615, 550, 0.2)
+    , m_change_direction_button("resources/images/change_direction_button.png", 1785, 295, 0.17)
     , m_player("resources/fonts/arial.ttf", "you",  sf::Color(255, 228, 156), 50, 420, 55)
     , m_rival("resources/fonts/arial.ttf", "rival",  sf::Color(255, 228, 156), 50, 1085, 55)
-    , m_message("resources/fonts/arial.ttf", "Place the ship on the board",  sf::Color(255, 228, 156), 26, 1500, 300)
+    , m_message("resources/fonts/arial.ttf", "Place the ship on the board",  sf::Color(255, 228, 156), 25, 1460, 300)
     {
 
     };
