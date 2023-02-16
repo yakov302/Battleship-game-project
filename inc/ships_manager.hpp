@@ -23,6 +23,8 @@ class ShipManager
 public:
     ShipManager();
 
+    int x(int i, bool direction);
+    int y(int i, bool direction);
     int left(int i, bool direction);
     int right (int i, bool direction);
     int top(int i, bool direction); 
@@ -32,7 +34,6 @@ public:
     int size (int i, bool direction);
 
     void locate_ship(int i, bool direction);
-    bool is_ship_located(int i, bool direction);
     void draw_located_ships(sf::RenderWindow& window);
     void set_ship_position(int i, bool direction, int x, int y);
     void draw_ship(int i, bool direction, sf::RenderWindow& window);

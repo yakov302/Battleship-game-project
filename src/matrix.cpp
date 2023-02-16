@@ -19,7 +19,7 @@ void init_matrix(Square* buffer)
         {
             buffer[get_index(i, j)].x = X_BASE + SQUARE_SIZE*j;
             buffer[get_index(i, j)].y = Y_BASE + SQUARE_SIZE*i;
-            buffer[get_index(i, j)].status = 0;
+            buffer[get_index(i, j)].status = EMPTY;
         }
     }
 }
@@ -49,15 +49,17 @@ Matrix::Matrix()
 
 int Matrix::get_status(int x, int y)
 {
-    int index = impl::get_index(x, y);
-    assert(impl::is_index_inside_matrix_range(index));
+    int index = give_index(x, y);
+    if(! impl::is_index_inside_matrix_range(index))
+        return OUTSIDE_MATRIX_RANGE;
     return m_matrix[index].status;
 }
 
 void Matrix::set_status(int x, int y, int value)
 {
-    int index = impl::get_index(x, y);
-    assert(impl::is_index_inside_matrix_range(index));
+    int index = give_index(x, y);
+    if(!impl::is_index_inside_matrix_range(index))
+        return;
     m_matrix[index].status = value;
 }
 

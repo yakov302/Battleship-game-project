@@ -12,6 +12,12 @@
 namespace battle_ship
 {
 
+#define GAP 1
+#define SHIP 1
+#define EMPTY 0
+#define SHIP_HIT 2
+#define EMPTY_HIT 3
+
 class Screen
 {
 public:

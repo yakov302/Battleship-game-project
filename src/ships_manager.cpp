@@ -89,12 +89,20 @@ void ShipManager::set_ship_position(int i, bool direction, int x, int y)
         m_vertical[i].get()->set_position(x, y);
 }
 
-bool ShipManager::is_ship_located(int i, bool direction)
+int ShipManager::x(int i, bool direction)
 {
     if(direction == HORIZONTAL)
-        return m_horizontal[i].get()->is_located();
+        return m_horizontal[i].get()->x();
     else
-        return m_vertical[i].get()->is_located(); 
+        return m_vertical[i].get()->x();
+}
+
+int ShipManager::y(int i, bool direction)
+{
+    if(direction == HORIZONTAL)
+        return m_horizontal[i].get()->y();
+    else
+        return m_vertical[i].get()->y();
 }
 
 int ShipManager::left(int i, bool direction)
@@ -156,15 +164,9 @@ int ShipManager::size (int i, bool direction)
 void ShipManager::locate_ship(int i, bool direction)
 {
     if(direction == HORIZONTAL)
-    {
-        m_horizontal[i].get()->set_located(ON_BORD);
         m_locate_ships[i] = m_horizontal[i];
-    }
     else
-    {
-        m_vertical[i].get()->set_located(ON_BORD);
         m_locate_ships[i] = m_vertical[i];
-    }
 }
 
 

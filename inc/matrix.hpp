@@ -5,7 +5,8 @@
 
 namespace battle_ship
 {
-
+    
+#define EMPTY 0
 #define X_BASE 144
 #define Y_BASE 120
 #define SQUARE_SIZE 63
