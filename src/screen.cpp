@@ -161,10 +161,37 @@ void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& 
     }
 
     background.set_message("");
-    set_matrix_status(i, direction, ship_manager, matrix);
+    set_matrix_status(i, di    usleep(250);
+rection, ship_manager, matrix);
     ship_manager.locate_ship(ship_index, ship_direction);
     ship_direction = HORIZONTAL;
     ++ship_index;
+}
+
+bool is_image_not_should_by_set(int status)
+{
+    return(status == OUTSIDE_MATRIX_RANGE
+        || status == SHIP_HIT
+        || status == EMPTY_HIT);
+}
+
+void handle_mouse_pressed(Matrix& matrix, ImageManager& images, int x, int y)
+{
+    int index = matrix.give_index(x, y);
+    int status = matrix.get_status(matrix.give_x(index), matrix.give_y(index));
+    if(is_image_not_should_by_set(status))
+        return;
+
+    if(status == SHIP)
+    {
+        images.set_fire(matrix.give_x(index), matrix.give_y(index));
+        matrix.set_status(x, y, SHIP_HIT);
+    }
+    else
+    {
+        images.set_x(matrix.give_x(index), matrix.give_y(index));
+        matrix.set_status(x, y, EMPTY_HIT);
+    }
 }
 
 
@@ -199,6 +226,7 @@ void Screen::draw_game()
 {
     m_background.draw(m_window);
     m_ships_manager.draw_located_ships(m_window);
+    m_image_manager.draw(m_window);
 }
 
 void Screen::check_mouse_locate()
@@ -228,7 +256,11 @@ void Screen::check_mouse_locate()
 
 void Screen::check_mouse_game()
 { 
+    int x = impl::mouse_x_position(m_window);
+    int y = impl::mouse_y_position(m_window);
 
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        impl::handle_mouse_pressed(m_player_matrix, m_image_manager, x, y);
 }
 
 void Screen::check_events()

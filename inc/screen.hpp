@@ -8,6 +8,7 @@
 
 #include "background.hpp"
 #include "ships_manager.hpp"
+#include "image_manager.hpp"
 
 namespace battle_ship
 {
@@ -45,6 +46,7 @@ private:
     Matrix m_player_matrix;
     Background m_background;
     ShipManager m_ships_manager;
+    ImageManager m_image_manager;
 };
 
 
