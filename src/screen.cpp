@@ -161,8 +161,7 @@ void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& 
     }
 
     background.set_message("");
-    set_matrix_status(i, di    usleep(250);
-rection, ship_manager, matrix);
+    set_matrix_status(i, direction, ship_manager, matrix);
     ship_manager.locate_ship(ship_index, ship_direction);
     ship_direction = HORIZONTAL;
     ++ship_index;
