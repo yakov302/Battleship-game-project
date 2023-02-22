@@ -77,17 +77,17 @@ std::pair<int, int> set_point(ShipManager& ship_manager, Matrix& matrix, int i, 
     return std::pair<int, int>(x, y);
 }
 
-void set_matrix_status(int i, bool direction, ShipManager& ship_manager, Matrix& matrix)
+void set_matrix_status(int ship_index, bool direction, ShipManager& ship_manager, Matrix& matrix)
 {
-    int x = ship_manager.x(i, direction);
-    int y = ship_manager.y(i, direction);
-    int size = ship_manager.size(i, direction);
+    int x = ship_manager.x(ship_index, direction);
+    int y = ship_manager.y(ship_index, direction);
+    int size = ship_manager.size(ship_index, direction);
 
     if(direction == HORIZONTAL)
     {
         for(int i = 0; i < size; ++i)
         {
-            matrix.set_status(x, y, SHIP);
+            matrix.set_square(x, y, SHIP, ship_index);
             x += SQUARE_SIZE;
         }
     }
@@ -95,7 +95,7 @@ void set_matrix_status(int i, bool direction, ShipManager& ship_manager, Matrix&
     {
         for(int i = 0; i < size; ++i)
         {
-            matrix.set_status(x, y, SHIP);
+            matrix.set_square(x, y, SHIP, ship_index);
             y += SQUARE_SIZE;
         }
     }
@@ -103,11 +103,11 @@ void set_matrix_status(int i, bool direction, ShipManager& ship_manager, Matrix&
 
 bool there_is_close_ship(int x, int y,  Matrix& matrix)
 {
-    if(matrix.get_status(x, y)               == SHIP
-    || matrix.get_status(x + SQUARE_SIZE, y) == SHIP
-    || matrix.get_status(x - SQUARE_SIZE, y) == SHIP
-    || matrix.get_status(x, y + SQUARE_SIZE) == SHIP
-    || matrix.get_status(x, y - SQUARE_SIZE) == SHIP)
+    if(matrix.give_status(x, y)               == SHIP
+    || matrix.give_status(x + SQUARE_SIZE, y) == SHIP
+    || matrix.give_status(x - SQUARE_SIZE, y) == SHIP
+    || matrix.give_status(x, y + SQUARE_SIZE) == SHIP
+    || matrix.give_status(x, y - SQUARE_SIZE) == SHIP)
         return true;
     return false;
 }
@@ -174,22 +174,23 @@ bool is_image_not_should_by_set(int status)
         || status == EMPTY_HIT);
 }
 
-void handle_mouse_pressed(Matrix& matrix, ImageManager& images, int x, int y)
+void handle_mouse_pressed(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, int x, int y)
 {
     int index = matrix.give_index(x, y);
-    int status = matrix.get_status(matrix.give_x(index), matrix.give_y(index));
+    int status = matrix.give_status(x, y);
     if(is_image_not_should_by_set(status))
         return;
 
     if(status == SHIP)
     {
-        images.set_fire(matrix.give_x(index), matrix.give_y(index));
         matrix.set_status(x, y, SHIP_HIT);
+        ship_manager.hit(matrix.give_ship_index(x, y));
+        images.set_fire(matrix.give_x(index), matrix.give_y(index));
     }
     else
     {
-        images.set_x(matrix.give_x(index), matrix.give_y(index));
         matrix.set_status(x, y, EMPTY_HIT);
+        images.set_x(matrix.give_x(index), matrix.give_y(index));
     }
 }
 
@@ -259,7 +260,7 @@ void Screen::check_mouse_game()
     int y = impl::mouse_y_position(m_window);
 
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        impl::handle_mouse_pressed(m_player_matrix, m_image_manager, x, y);
+        impl::handle_mouse_pressed(m_player_matrix, m_image_manager, m_ships_manager, x, y);
 }
 
 void Screen::check_events()

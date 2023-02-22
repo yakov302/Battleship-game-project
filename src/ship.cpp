@@ -7,6 +7,7 @@ Ship::Ship(std::string image_path, int size, int x = 0, int y = 0, float scale =
 : m_x(x)
 , m_y(y)
 , m_size(size)
+, m_hits(0)
 , m_direction(false)
 , m_image(image_path, x, y, scale)
 {
@@ -78,6 +79,17 @@ int Ship::top()const
 int Ship::bottom()const
 {
     return m_image.bottom();
+}
+
+
+bool Ship::is_the_ship_sank()
+{
+    return (m_hits == m_size);
+}
+
+void Ship::hit()
+{
+    ++m_hits;
 }
 
 

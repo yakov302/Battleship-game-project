@@ -33,6 +33,7 @@ public:
     int length (int i, bool direction);
     int size (int i, bool direction);
 
+    void hit (int i);
     void locate_ship(int i, bool direction);
     void draw_located_ships(sf::RenderWindow& window);
     void set_ship_position(int i, bool direction, int x, int y);

@@ -20,6 +20,7 @@ void init_matrix(Square* buffer)
             buffer[get_index(i, j)].x = X_BASE + SQUARE_SIZE*j;
             buffer[get_index(i, j)].y = Y_BASE + SQUARE_SIZE*i;
             buffer[get_index(i, j)].status = EMPTY;
+            buffer[get_index(i, j)].ship_index = EMPTY;
         }
     }
 }
@@ -47,7 +48,7 @@ Matrix::Matrix()
     impl::init_matrix(m_matrix);
 }
 
-int Matrix::get_status(int x, int y)
+int Matrix::give_status(int x, int y)
 {
     int index = give_index(x, y);
     if(! impl::is_index_inside_matrix_range(index))
@@ -55,12 +56,29 @@ int Matrix::get_status(int x, int y)
     return m_matrix[index].status;
 }
 
-void Matrix::set_status(int x, int y, int value)
+int Matrix::give_ship_index(int x, int y)
+{
+    int index = give_index(x, y);
+    if(! impl::is_index_inside_matrix_range(index))
+        return OUTSIDE_MATRIX_RANGE;
+    return m_matrix[index].ship_index;
+}
+
+void Matrix::set_status(int x, int y, int status)
 {
     int index = give_index(x, y);
     if(!impl::is_index_inside_matrix_range(index))
         return;
-    m_matrix[index].status = value;
+    m_matrix[index].status = status;
+}
+
+void Matrix::set_square(int x, int y, int status, int ship_index)
+{
+    int index = give_index(x, y);
+    if(!impl::is_index_inside_matrix_range(index))
+        return;
+    m_matrix[index].status = status;
+    m_matrix[index].ship_index = ship_index;
 }
 
 int Matrix::give_index(int x, int y)

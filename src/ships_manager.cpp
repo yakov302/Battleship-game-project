@@ -32,7 +32,7 @@ void load_ship(ShipsMap& map, std::string& config_data, int i)
     int y_pos = std::stoi(next_slice_from_line(config_data));
     float scale = std::stof(next_slice_from_line(config_data));
     bool direction = std::stoi(next_slice_from_line(config_data));
-   
+
     map[i] = ShipPtr(new Ship(image_path, size, x_pos, y_pos, scale, direction));
     set_position(map[i]);
 }
@@ -167,6 +167,13 @@ void ShipManager::locate_ship(int i, bool direction)
         m_locate_ships[i] = m_horizontal[i];
     else
         m_locate_ships[i] = m_vertical[i];
+}
+
+void ShipManager::hit (int i)
+{
+    m_locate_ships[i].get()->hit();
+    if(m_locate_ships[i].get()->is_the_ship_sank())
+        m_locate_ships.erase(i);
 }
 
 
