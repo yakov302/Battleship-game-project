@@ -11,14 +11,14 @@ int get_index(int x, int y)
     return NUM_OF_COLUMNS*x + y;
 }
    
-void init_matrix(Square* buffer)
+void init_matrix(Square* buffer, int x_base, int y_base)
 {
     for(int i = 0; i < NUM_OF_COLUMNS; ++i)
     {
         for(int j = 0; j < NUM_OF_COLUMNS; ++j)
         {
-            buffer[get_index(i, j)].x = X_BASE + SQUARE_SIZE*j;
-            buffer[get_index(i, j)].y = Y_BASE + SQUARE_SIZE*i;
+            buffer[get_index(i, j)].x = x_base + SQUARE_SIZE*j;
+            buffer[get_index(i, j)].y = y_base + SQUARE_SIZE*i;
             buffer[get_index(i, j)].status = EMPTY;
             buffer[get_index(i, j)].ship_index = EMPTY;
         }
@@ -33,9 +33,9 @@ int is_index_inside_matrix_range(int index)
     return true;
 }
 
-int is_point_inside_matrix_range(int x, int y)
+int is_point_inside_matrix_range(int x, int y, int x_base, int y_base)
 {
-    if(x < X_BASE || y <  Y_BASE || x > X_BASE + SQUARE_SIZE*NUM_OF_COLUMNS || y > Y_BASE + SQUARE_SIZE*NUM_OF_COLUMNS)
+    if(x < x_base || y <  y_base || x > x_base + SQUARE_SIZE*NUM_OF_COLUMNS || y > y_base + SQUARE_SIZE*NUM_OF_COLUMNS)
         return false;
     return true;
 }
@@ -43,9 +43,11 @@ int is_point_inside_matrix_range(int x, int y)
 
 }//impl namespace
 
-Matrix::Matrix()
+Matrix::Matrix(int x_base, int y_base)
+: m_x_base(x_base)
+, m_y_base(y_base)
 {
-    impl::init_matrix(m_matrix);
+    impl::init_matrix(m_matrix, m_x_base, m_y_base);
 }
 
 int Matrix::give_status(int x, int y)
@@ -77,13 +79,14 @@ void Matrix::set_square(int x, int y, int status, int ship_index)
     int index = give_index(x, y);
     if(!impl::is_index_inside_matrix_range(index))
         return;
+        
     m_matrix[index].status = status;
     m_matrix[index].ship_index = ship_index;
 }
 
 int Matrix::give_index(int x, int y)
 {
-    if(! impl::is_point_inside_matrix_range(x, y))
+    if(! impl::is_point_inside_matrix_range(x, y, m_x_base, m_y_base))
         return OUTSIDE_MATRIX_RANGE;
 
     for(int i = 0; i < NUM_OF_COLUMNS; ++i)

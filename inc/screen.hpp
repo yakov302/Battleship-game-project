@@ -6,6 +6,7 @@
 #include <utility>
 #include <SFML/Graphics.hpp>
 
+#include "rival.hpp"
 #include "background.hpp"
 #include "ships_manager.hpp"
 #include "image_manager.hpp"
@@ -43,7 +44,9 @@ private:
     sf::Event m_event;
     sf::RenderWindow m_window;
 
+    Rival m_rival;
     Matrix m_player_matrix;
+    Matrix m_rival_matrix;
     Background m_background;
     ShipManager m_ships_manager;
     ImageManager m_image_manager;

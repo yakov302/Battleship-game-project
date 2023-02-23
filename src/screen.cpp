@@ -41,9 +41,9 @@ bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direc
 {
     return 
     (
-        ship_manager.x(i, direction)   < X_BASE - SQUARE_SIZE/2                                    ||
-        ship_manager.right(i, direction)  > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2  ||
-        ship_manager.y(i, direction)    < Y_BASE - SQUARE_SIZE/2                                   ||
+        ship_manager.x(i, direction)      < X_BASE - SQUARE_SIZE/2                                ||
+        ship_manager.right(i, direction)  > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2 ||
+        ship_manager.y(i, direction)      < Y_BASE - SQUARE_SIZE/2                                ||
         ship_manager.bottom(i, direction) > Y_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
     );
 }
@@ -174,7 +174,7 @@ bool is_image_not_should_by_set(int status)
         || status == EMPTY_HIT);
 }
 
-void handle_mouse_pressed(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, int x, int y)
+void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y)
 {
     int index = matrix.give_index(x, y);
     int status = matrix.give_status(x, y);
@@ -184,7 +184,7 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, ShipManager& shi
     if(status == SHIP)
     {
         matrix.set_status(x, y, SHIP_HIT);
-        ship_manager.hit(matrix.give_ship_index(x, y));
+        rival.hit(matrix.give_ship_index(x, y));
         images.set_fire(matrix.give_x(index), matrix.give_y(index));
     }
     else
@@ -200,6 +200,9 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, ShipManager& shi
 
 Screen::Screen()
 : m_window(sf::VideoMode::getDesktopMode(), "Battleship")
+, m_rival()
+, m_player_matrix(X_BASE, Y_BASE)        
+, m_rival_matrix(X_RIVAL_BASE, Y_RIVAL_BASE)
 {
     m_thread = new std::thread(impl::thread_function, this);
 }
@@ -260,7 +263,7 @@ void Screen::check_mouse_game()
     int y = impl::mouse_y_position(m_window);
 
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        impl::handle_mouse_pressed(m_player_matrix, m_image_manager, m_ships_manager, x, y);
+        impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y);
 }
 
 void Screen::check_events()
@@ -280,6 +283,8 @@ void Screen::check_events()
 
 void Screen::locate_loop()
 {
+    m_rival.place_the_ships_on_board(m_rival_matrix);
+
     while(m_window.isOpen() && ship_index < NUM_OF_SHIPS)
     {
         m_window.clear();

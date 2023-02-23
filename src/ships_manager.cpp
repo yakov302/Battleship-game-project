@@ -46,6 +46,9 @@ void load_ships(ShipsMap& map, std::ifstream& config_file)
         load_ship(map, line, i); 
         ++i;    
     }
+
+    end = 0;
+    begine = 0;
 }
 
 

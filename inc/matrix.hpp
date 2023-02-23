@@ -9,6 +9,8 @@ namespace battle_ship
 #define EMPTY 0
 #define X_BASE 144
 #define Y_BASE 120
+#define X_RIVAL_BASE 814
+#define Y_RIVAL_BASE 120
 #define SQUARE_SIZE 63
 #define NUM_OF_COLUMNS 10
 #define NUM_OF_POINTS 100
@@ -25,7 +27,7 @@ struct Square
 class Matrix
 {
 public:
-    Matrix();
+    Matrix(int x_base, int y_base);
 
     void set_status(int x, int y, int status);
     void set_square(int x, int y, int status, int ship_index);
@@ -39,6 +41,8 @@ public:
     friend std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix);
 
 private:
+    int m_x_base;
+    int m_y_base;
     Square m_matrix[NUM_OF_POINTS];
 };
 
