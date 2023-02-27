@@ -40,25 +40,21 @@ void load_ships(RivalShipsMap& map, std::ifstream& config_file)
     }
 }
 
-bool the_ship_is_next_to_another_ship(int x, int y, int size, bool direction, Matrix& matrix)
+void increase_index(int* x, int* y, bool direction)
 {
     if(direction == HORIZONTAL)
-    {
-        for(int i = 0; i < size; ++i)
-        {
-            if(there_is_close_ship(x, y, matrix))
-                return true;
-            x += SQUARE_SIZE;
-        }
-    }
+        *x += SQUARE_SIZE;
     else
+        *y += SQUARE_SIZE;
+}
+
+bool the_ship_is_next_to_another_ship(int x, int y, int size, bool direction, Matrix& matrix)
+{
+    for(int i = 0; i < size; ++i)
     {
-        for(int i = 0; i < size; ++i)
-        {
-            if(there_is_close_ship(x, y, matrix))
-                return true;
-            y += SQUARE_SIZE;
-        }
+        if(there_is_close_ship(x, y, matrix))
+            return true;
+        increase_index(&x, &y, direction);
     }
 
     return false;
@@ -77,29 +73,46 @@ bool the_ship_is_off_the_grid_board(int left, int right, int top, int bottom)
 
 int rand_x()
 {
-    int x = distribution(seed_engine)%9;
+    int x = distribution(seed_engine)%10;
     return X_RIVAL_BASE + x*SQUARE_SIZE;
 }
 
 int rand_y()
 {
-    int y = distribution(seed_engine)%9;
+    int y = distribution(seed_engine)%10;
     return Y_RIVAL_BASE + y*SQUARE_SIZE;
+}
+
+void set_right_and_bottom(int* right, int* bottom, int x, int y, int size, bool direction)
+{
+    if(direction == HORIZONTAL)
+    {
+        *right = x + size*SQUARE_SIZE; 
+        *bottom = y + SQUARE_SIZE;
+    }
+    else
+    {
+        *right = x + SQUARE_SIZE; 
+        *bottom = y + size*SQUARE_SIZE;
+    }
 }
 
 void check_if_point_valid(int* x, int* y, int size, bool direction, Matrix& matrix)
 {
+    int right, bottom;
+    set_right_and_bottom(&right, &bottom, *x, *y, size, direction);
+
     while(impl::the_ship_is_next_to_another_ship(*x, *y, size, direction, matrix) 
-        ||impl::the_ship_is_off_the_grid_board(*x, *x + size*SQUARE_SIZE, *y, *y + SQUARE_SIZE))
+        ||impl::the_ship_is_off_the_grid_board(*x, right, *y, bottom))
     {
         *x = impl::rand_x();
         *y = impl::rand_y();
+        set_right_and_bottom(&right, &bottom, *x, *y, size, direction);
     }
 }
 
 
 }//impl namespace
-
 
 Rival::Rival()
 {
@@ -118,27 +131,11 @@ void Rival::place_the_ships_on_board(Matrix& matrix)
         int size = m_horizontal[ship_index].size;
         bool direction = distribution(seed_engine)%2;
 
-        if(direction == HORIZONTAL)
+        impl::check_if_point_valid(&x, &y, size, direction, matrix);
+        for(int i = 0; i < size; ++i)
         {
-            impl::check_if_point_valid(&x, &y, size, direction, matrix);
-            std::cout << "size: " << size << "\n";
-            for(int i = 0; i < size; ++i)
-            {
-                matrix.set_square(x, y, SHIP, ship_index);
-                x += SQUARE_SIZE;
-            }
-            std::cout << matrix << "\n";
-        }
-        else
-        {
-            impl::check_if_point_valid(&x, &y, size, direction, matrix);
-            std::cout << "size: " << size << "\n";
-            for(int i = 0; i < size; ++i)
-            {
-                matrix.set_square(x, y, SHIP, ship_index);
-                y += SQUARE_SIZE;
-            }
-            std::cout << matrix << "\n";
+            matrix.set_square(x, y, SHIP, ship_index);
+            impl::increase_index(&x, &y, direction);
         }
     }
 }

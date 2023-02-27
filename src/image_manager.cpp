@@ -9,15 +9,15 @@ namespace impl
 
 void init_x(std::vector<ImagePtr>& vector)
 {
-    vector.reserve(170);
-    for(int i = 0; i < 170; ++i)
+    vector.reserve(NUM_OF_X);
+    for(int i = 0; i < NUM_OF_X; ++i)
         vector.emplace_back(ImagePtr(new Image("resources/images/x.png", 0, 0, 0.25)));
 }
 
 void init_fire(std::vector<ImagePtr>& vector)
 {
-    vector.reserve(40);
-    for(int i = 0; i < 40; ++i)
+    vector.reserve(NUM_OF_FIRE);
+    for(int i = 0; i < NUM_OF_FIRE; ++i)
         vector.emplace_back(ImagePtr(new Image("resources/images/fire.png", 0, 0, 0.08)));
 }
 

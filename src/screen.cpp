@@ -11,6 +11,8 @@ bool ships_location_phase = true;
 namespace impl
 {
 
+extern void increase_index(int* x, int* y, bool direction);
+
 static void* thread_function(void* arg)
 {
     Screen* screen = static_cast<Screen*>(arg);
@@ -41,11 +43,27 @@ bool the_ship_is_off_the_grid_board(ShipManager& ship_manager, int i, bool direc
 {
     return 
     (
-        ship_manager.x(i, direction)      < X_BASE - SQUARE_SIZE/2                                ||
-        ship_manager.right(i, direction)  > X_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2 ||
-        ship_manager.y(i, direction)      < Y_BASE - SQUARE_SIZE/2                                ||
-        ship_manager.bottom(i, direction) > Y_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
+        ship_manager.x(i, direction)      < X_PLAYER_BASE - SQUARE_SIZE/2                                ||
+        ship_manager.right(i, direction)  > X_PLAYER_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2 ||
+        ship_manager.y(i, direction)      < Y_PLAYER_BASE - SQUARE_SIZE/2                                ||
+        ship_manager.bottom(i, direction) > Y_PLAYER_BASE + (NUM_OF_COLUMNS*SQUARE_SIZE) + SQUARE_SIZE/2
     );
+}
+
+int set_x_gap(bool direction, int size, int i, ShipManager& ship_manager)
+{
+    if(direction == HORIZONTAL)
+        return size - ship_manager.length(i, direction); 
+    else
+        return SQUARE_SIZE - ship_manager.length(i, direction);
+}
+
+int set_y_gap(bool direction, int size, int i, ShipManager& ship_manager)
+{
+    if(direction == HORIZONTAL)
+        return SQUARE_SIZE -  ship_manager.width(i, direction);
+    else
+        return size - ship_manager.width(i, direction);
 }
 
 std::pair<int, int> set_point(ShipManager& ship_manager, Matrix& matrix, int i, bool direction)
@@ -55,23 +73,16 @@ std::pair<int, int> set_point(ShipManager& ship_manager, Matrix& matrix, int i, 
     if(direction == HORIZONTAL)
         y += ship_manager.width(i, direction);
 
-    int index = matrix.give_index(x, y);
-    x = matrix.give_x(index);
-    y = matrix.give_y(index);
+    x = matrix.give_x(x, y);
+    y = matrix.give_y(x, y);
 
     int gap;
     int size = ship_manager.size(i, direction)*SQUARE_SIZE;
 
-    if(direction == HORIZONTAL)
-        gap = size - ship_manager.length(i, direction); 
-    else
-        gap = SQUARE_SIZE - ship_manager.length(i, direction);
+    gap = set_x_gap(direction, size, i, ship_manager);
     x = x + gap/2 + GAP;
 
-    if(direction == HORIZONTAL)
-        gap = SQUARE_SIZE -  ship_manager.width(i, direction);
-    else
-        gap = size - ship_manager.width(i, direction);
+    gap = set_y_gap(direction, size, i, ship_manager);
     y = y + gap/2 + GAP;
 
     return std::pair<int, int>(x, y);
@@ -83,22 +94,12 @@ void set_matrix_status(int ship_index, bool direction, ShipManager& ship_manager
     int y = ship_manager.y(ship_index, direction);
     int size = ship_manager.size(ship_index, direction);
 
-    if(direction == HORIZONTAL)
+    for(int i = 0; i < size; ++i)
     {
-        for(int i = 0; i < size; ++i)
-        {
-            matrix.set_square(x, y, SHIP, ship_index);
-            x += SQUARE_SIZE;
-        }
+        matrix.set_square(x, y, SHIP, ship_index);
+        increase_index(&x, &y, direction);
     }
-    else
-    {
-        for(int i = 0; i < size; ++i)
-        {
-            matrix.set_square(x, y, SHIP, ship_index);
-            y += SQUARE_SIZE;
-        }
-    }
+
 }
 
 bool there_is_close_ship(int x, int y,  Matrix& matrix)
@@ -118,26 +119,20 @@ bool the_ship_is_next_to_another_ship(int i, bool direction, ShipManager& ship_m
     int y = ship_manager.y(i, direction);
     int size = ship_manager.size(i, direction);
 
-    if(direction == HORIZONTAL)
+    for(int i = 0; i < size; ++i)
     {
-        for(int i = 0; i < size; ++i)
-        {
-            if(there_is_close_ship(x, y, matrix))
-                return true;
-            x += SQUARE_SIZE;
-        }
-    }
-    else
-    {
-        for(int i = 0; i < size; ++i)
-        {
-            if(there_is_close_ship(x, y, matrix))
-                return true;
-            y += SQUARE_SIZE;
-        }
+        if(there_is_close_ship(x, y, matrix))
+            return true;
+        increase_index(&x, &y, direction);
     }
 
     return false;
+}
+
+void invalid_position(std::string message, int i, bool direction, ShipManager& ship_manager, Background& background)
+{
+    background.set_message(message);
+    ship_manager.set_ship_position(i, direction, X_START_POINT - ship_manager.length(i, direction)/2, Y_START_POINT);
 }
 
 void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& matrix, Background& background)
@@ -148,15 +143,13 @@ void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& 
 
     if(the_ship_is_off_the_grid_board(ship_manager, i, direction))
     {
-        background.set_message("Off the board");
-        ship_manager.set_ship_position(i, direction, X_START_POINT - ship_manager.length(i, direction)/2, Y_START_POINT);
+        invalid_position("Off the board", i, direction, ship_manager, background);
         return;
     }
 
     if(the_ship_is_next_to_another_ship(i, direction, ship_manager, matrix))
     {
-        background.set_message("Not allowed near another ship");
-        ship_manager.set_ship_position(i, direction, X_START_POINT - ship_manager.length(i, direction)/2, Y_START_POINT);
+        invalid_position("Not allowed near another ship", i, direction, ship_manager, background);
         return;
     }
 
@@ -176,7 +169,6 @@ bool is_image_not_should_by_set(int status)
 
 void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y)
 {
-    int index = matrix.give_index(x, y);
     int status = matrix.give_status(x, y);
     if(is_image_not_should_by_set(status))
         return;
@@ -185,12 +177,12 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
     {
         matrix.set_status(x, y, SHIP_HIT);
         rival.hit(matrix.give_ship_index(x, y));
-        images.set_fire(matrix.give_x(index), matrix.give_y(index));
+        images.set_fire(matrix.give_x(x, y), matrix.give_y(x, y));
     }
     else
     {
         matrix.set_status(x, y, EMPTY_HIT);
-        images.set_x(matrix.give_x(index), matrix.give_y(index));
+        images.set_x(matrix.give_x(x, y), matrix.give_y(x, y));
     }
 }
 
@@ -201,7 +193,7 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
 Screen::Screen()
 : m_window(sf::VideoMode::getDesktopMode(), "Battleship")
 , m_rival()
-, m_player_matrix(X_BASE, Y_BASE)        
+, m_player_matrix(X_PLAYER_BASE, Y_PLAYER_BASE)        
 , m_rival_matrix(X_RIVAL_BASE, Y_RIVAL_BASE)
 {
     m_thread = new std::thread(impl::thread_function, this);
@@ -228,8 +220,8 @@ void Screen::draw_locate()
 void Screen::draw_game()
 {
     m_background.draw(m_window);
-    m_ships_manager.draw_located_ships(m_window);
     m_image_manager.draw(m_window);
+    m_ships_manager.draw_located_ships(m_window);
 }
 
 void Screen::check_mouse_locate()
@@ -283,8 +275,6 @@ void Screen::check_events()
 
 void Screen::locate_loop()
 {
-    m_rival.place_the_ships_on_board(m_rival_matrix);
-
     while(m_window.isOpen() && ship_index < NUM_OF_SHIPS)
     {
         m_window.clear();
@@ -294,6 +284,7 @@ void Screen::locate_loop()
         m_window.display();
     }
 
+    m_rival.place_the_ships_on_board(m_rival_matrix);
     ships_location_phase = false;
 }
 

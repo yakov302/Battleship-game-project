@@ -44,4 +44,4 @@ public:
 };
 
 
-}// poker battle_ship
+}// battle_ship namespace

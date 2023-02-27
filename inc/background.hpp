@@ -56,6 +56,7 @@ private:
     Image m_grid_board_player;
     Image m_grid_board_rival;
     Image m_change_direction_button;
+    
     Text m_player;
     Text m_rival;
     Text m_message;

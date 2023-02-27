@@ -9,9 +9,11 @@
 namespace battle_ship
 {
 
+#define X_Y_GUP 10
 #define FIRE_X_GUP 14
 #define FIRE_Y_GUP 11
-#define X_Y_GUP 10
+#define NUM_OF_X 170
+#define NUM_OF_FIRE 40
 
 using ImagePtr = std::shared_ptr<Image>;
 

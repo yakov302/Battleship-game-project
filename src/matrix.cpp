@@ -20,23 +20,30 @@ void init_matrix(Square* buffer, int x_base, int y_base)
             buffer[get_index(i, j)].x = x_base + SQUARE_SIZE*j;
             buffer[get_index(i, j)].y = y_base + SQUARE_SIZE*i;
             buffer[get_index(i, j)].status = EMPTY;
-            buffer[get_index(i, j)].ship_index = EMPTY;
+            buffer[get_index(i, j)].ship_index = 0;
         }
     }
 }
 
 int is_index_inside_matrix_range(int index)
 {
-
     if(index >= NUM_OF_POINTS || index < 0)
+    {
+        std::cout << "MATRIX ERROR: out of range!\n";
         return false;
+    }
+    
     return true;
 }
 
 int is_point_inside_matrix_range(int x, int y, int x_base, int y_base)
 {
     if(x < x_base || y <  y_base || x > x_base + SQUARE_SIZE*NUM_OF_COLUMNS || y > y_base + SQUARE_SIZE*NUM_OF_COLUMNS)
+    {
+        std::cout << "MATRIX ERROR: out of range!\n";
         return false;
+    }
+    
     return true;
 }
 
@@ -48,6 +55,24 @@ Matrix::Matrix(int x_base, int y_base)
 , m_y_base(y_base)
 {
     impl::init_matrix(m_matrix, m_x_base, m_y_base);
+}
+
+void Matrix::set_status(int x, int y, int status)
+{
+    int index = give_index(x, y);
+    if(!impl::is_index_inside_matrix_range(index))
+        return;
+    m_matrix[index].status = status;
+}
+
+void Matrix::set_square(int x, int y, int status, int ship_index)
+{
+    int index = give_index(x, y);
+    if(!impl::is_index_inside_matrix_range(index))
+        return;
+
+    m_matrix[index].status = status;
+    m_matrix[index].ship_index = ship_index;
 }
 
 int Matrix::give_status(int x, int y)
@@ -66,22 +91,34 @@ int Matrix::give_ship_index(int x, int y)
     return m_matrix[index].ship_index;
 }
 
-void Matrix::set_status(int x, int y, int status)
+int Matrix::give_x(int x, int y)
 {
     int index = give_index(x, y);
-    if(!impl::is_index_inside_matrix_range(index))
-        return;
-    m_matrix[index].status = status;
+    if(! impl::is_index_inside_matrix_range(index))
+        return OUTSIDE_MATRIX_RANGE;
+    return  m_matrix[index].x;
 }
 
-void Matrix::set_square(int x, int y, int status, int ship_index)
+int Matrix::give_y(int x, int y)
 {
     int index = give_index(x, y);
-    if(!impl::is_index_inside_matrix_range(index))
-        return;
-        
-    m_matrix[index].status = status;
-    m_matrix[index].ship_index = ship_index;
+    if(! impl::is_index_inside_matrix_range(index))
+        return OUTSIDE_MATRIX_RANGE;
+    return  m_matrix[index].y;
+}
+
+int Matrix::give_x(int index)
+{
+    if(! impl::is_index_inside_matrix_range(index))
+         return OUTSIDE_MATRIX_RANGE;
+    return m_matrix[index].x;
+}
+
+int Matrix::give_y(int index)
+{
+    if(! impl::is_index_inside_matrix_range(index))
+         return OUTSIDE_MATRIX_RANGE;
+    return m_matrix[index].y;
 }
 
 int Matrix::give_index(int x, int y)
@@ -104,20 +141,6 @@ int Matrix::give_index(int x, int y)
     }
 
     return OUTSIDE_MATRIX_RANGE; //Shouldn't get here
-}
-
-int Matrix::give_x(int index)
-{
-    if(! impl::is_index_inside_matrix_range(index))
-         return OUTSIDE_MATRIX_RANGE;
-    return m_matrix[index].x;
-}
-
-int Matrix::give_y(int index)
-{
-    if(! impl::is_index_inside_matrix_range(index))
-         return OUTSIDE_MATRIX_RANGE;
-    return m_matrix[index].y;
 }
 
 std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix)
