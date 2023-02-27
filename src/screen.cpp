@@ -167,6 +167,42 @@ bool is_image_not_should_by_set(int status)
         || status == EMPTY_HIT);
 }
 
+void place_x(Matrix& matrix, ImageManager& images, int x, int y)
+{
+    if(matrix.give_status(x + SQUARE_SIZE, y) == EMPTY)
+    {
+        matrix.set_status(x + SQUARE_SIZE, y, EMPTY_HIT);
+        images.set_x(x + SQUARE_SIZE, y);
+    }
+    
+    if(matrix.give_status(x - SQUARE_SIZE, y) == EMPTY)
+    {
+        matrix.set_status(x - SQUARE_SIZE, y, EMPTY_HIT);
+        images.set_x(x - SQUARE_SIZE, y);
+    }
+
+    if(matrix.give_status(x, y + SQUARE_SIZE) == EMPTY)
+    {
+        matrix.set_status(x, y + SQUARE_SIZE, EMPTY_HIT);
+        images.set_x(x, y + SQUARE_SIZE);
+    }
+    
+    if(matrix.give_status(x, y - SQUARE_SIZE) == EMPTY)
+    {
+        matrix.set_status(x, y - SQUARE_SIZE, EMPTY_HIT);
+        images.set_x(x, y - SQUARE_SIZE);
+    }
+}
+
+void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageManager& images)
+{
+    for(int i = 0; i < size; ++i)
+    {
+        impl::place_x(matrix, images, x, y);
+        impl::increase_index(&x, &y, direction);
+    }
+}
+
 void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y)
 {
     int status = matrix.give_status(x, y);
@@ -176,8 +212,11 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
     if(status == SHIP)
     {
         matrix.set_status(x, y, SHIP_HIT);
-        rival.hit(matrix.give_ship_index(x, y));
         images.set_fire(matrix.give_x(x, y), matrix.give_y(x, y));
+
+        int index = matrix.give_ship_index(x, y);
+        if(rival.hit(matrix.give_ship_index(x, y)))
+            sink_ship(rival.x(index), rival.y(index), rival.ship_size(index), rival.ship_direction(index), matrix, images);
     }
     else
     {

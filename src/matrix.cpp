@@ -29,7 +29,7 @@ int is_index_inside_matrix_range(int index)
 {
     if(index >= NUM_OF_POINTS || index < 0)
     {
-        std::cout << "MATRIX ERROR: out of range!\n";
+        //std::cout << "MATRIX ERROR: out of range!\n";
         return false;
     }
     
@@ -40,7 +40,7 @@ int is_point_inside_matrix_range(int x, int y, int x_base, int y_base)
 {
     if(x < x_base || y <  y_base || x > x_base + SQUARE_SIZE*NUM_OF_COLUMNS || y > y_base + SQUARE_SIZE*NUM_OF_COLUMNS)
     {
-        std::cout << "MATRIX ERROR: out of range!\n";
+        //std::cout << "MATRIX ERROR: out of range!\n";
         return false;
     }
     

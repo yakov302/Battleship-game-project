@@ -26,7 +26,7 @@ void load_ship(RivalShipsMap& map, std::string& config_data, int i)
         next_slice_from_line(config_data);
     bool direction = std::stoi(next_slice_from_line(config_data));
 
-    map[i] = RivalShip{size, 0, i, direction};
+    map[i] = RivalShip{0, 0, size, 0, i, direction};
 }
 
 void load_ships(RivalShipsMap& map, std::ifstream& config_file)
@@ -112,6 +112,7 @@ void check_if_point_valid(int* x, int* y, int size, bool direction, Matrix& matr
 }
 
 
+
 }//impl namespace
 
 Rival::Rival()
@@ -120,6 +121,17 @@ Rival::Rival()
     std::ifstream horizontal_ships_config("./resources/txt/horizontal_ships_config.txt");
     impl::load_ships(m_vertical, vertical_ships_config);
     impl::load_ships(m_horizontal, horizontal_ships_config);
+}
+
+void Rival::locate_ship(int i, int direction, int x, int y)
+{
+    if(direction == HORIZONTAL)
+        m_locate_ships[i] = m_horizontal[i];
+    else
+        m_locate_ships[i] = m_vertical[i];
+
+    m_locate_ships[i].x = x;
+    m_locate_ships[i].y = y;
 }
 
 void Rival::place_the_ships_on_board(Matrix& matrix)
@@ -132,6 +144,8 @@ void Rival::place_the_ships_on_board(Matrix& matrix)
         bool direction = distribution(seed_engine)%2;
 
         impl::check_if_point_valid(&x, &y, size, direction, matrix);
+        locate_ship(ship_index, direction, x, y);
+
         for(int i = 0; i < size; ++i)
         {
             matrix.set_square(x, y, SHIP, ship_index);
@@ -140,11 +154,32 @@ void Rival::place_the_ships_on_board(Matrix& matrix)
     }
 }
 
-void Rival::hit (int i)
+int Rival::x(int i)
+{
+    return m_locate_ships[i].x;
+}
+
+int Rival::y(int i)
+{    
+    return m_locate_ships[i].y;
+}
+
+int Rival::ship_size(int index)
+{
+    return m_horizontal[index].size;
+}
+
+bool Rival::ship_direction(int index)
+{
+    return m_locate_ships[index].direction;
+}
+
+bool Rival::hit (int i)
 {
     m_locate_ships[i].hits++;
     if(m_locate_ships[i].hits == m_locate_ships[i].size)
-        m_locate_ships.erase(i);
+        return true;
+    return false;
 }
 
 
