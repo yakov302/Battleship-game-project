@@ -29,9 +29,11 @@ public:
 
     bool direction();
     bool is_the_ship_sank();
+    bool did_the_ship_sink();
     bool is_in_range(int x, int y);
-
+    
     void hit();
+    void sink_the_ship();
     void set_position(int x, int y);
     void draw(sf::RenderWindow& a_window)const;
 
@@ -40,6 +42,7 @@ private:
     int m_y;
     int m_size;
     int m_hits;
+    bool m_sank;
     bool m_direction;
     Image m_image;
 };

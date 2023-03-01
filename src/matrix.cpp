@@ -65,7 +65,7 @@ void Matrix::set_status(int x, int y, int status)
     m_matrix[index].status = status;
 }
 
-void Matrix::set_square(int x, int y, int status, int ship_index)
+void Matrix::set_square(int x, int y, int status, int ship_index, bool direction)
 {
     int index = give_index(x, y);
     if(!impl::is_index_inside_matrix_range(index))
@@ -73,6 +73,7 @@ void Matrix::set_square(int x, int y, int status, int ship_index)
 
     m_matrix[index].status = status;
     m_matrix[index].ship_index = ship_index;
+    m_matrix[index].direction = direction;
 }
 
 int Matrix::give_status(int x, int y)
@@ -119,6 +120,14 @@ int Matrix::give_y(int index)
     if(! impl::is_index_inside_matrix_range(index))
          return OUTSIDE_MATRIX_RANGE;
     return m_matrix[index].y;
+}
+
+int Matrix::give_direction(int x, int y)
+{
+    int index = give_index(x, y);
+    if(! impl::is_index_inside_matrix_range(index))
+        return OUTSIDE_MATRIX_RANGE;
+    return  m_matrix[index].direction;
 }
 
 int Matrix::give_index(int x, int y)

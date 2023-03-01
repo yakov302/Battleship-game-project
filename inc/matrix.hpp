@@ -22,6 +22,7 @@ struct Square
     int y;
     int status;
     int ship_index;
+    bool direction;
 };
 
 class Matrix
@@ -30,12 +31,13 @@ public:
     Matrix(int x_base, int y_base);
 
     void set_status(int x, int y, int status);
-    void set_square(int x, int y, int status, int ship_index);
+    void set_square(int x, int y, int status, int ship_index, bool direction);
 
     int give_x(int x, int y);
     int give_y(int x, int y);
     int give_index(int x, int y);
     int give_status(int x, int y);
+    int give_direction(int x, int y);
     int give_ship_index(int x, int y);
 
     friend std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix);

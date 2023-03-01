@@ -172,11 +172,31 @@ void ShipManager::locate_ship(int i, bool direction)
         m_locate_ships[i] = m_vertical[i];
 }
 
-void ShipManager::hit (int i)
+bool ShipManager::hit (int i)
 {
     m_locate_ships[i].get()->hit();
     if(m_locate_ships[i].get()->is_the_ship_sank())
-        m_locate_ships.erase(i);
+    {
+        return true;
+        //m_locate_ships.erase(i);
+    }
+    return false;
+}
+
+void ShipManager::sink_the_ship(int i, bool direction)
+{
+    if(direction == HORIZONTAL)
+        m_horizontal[i].get()->sink_the_ship();
+    else
+        m_vertical[i].get()->sink_the_ship(); 
+}
+
+bool ShipManager::did_the_ship_sink(int i, bool direction)
+{
+    if(direction == HORIZONTAL)
+        return m_horizontal[i].get()->did_the_ship_sink();
+    else
+        return m_vertical[i].get()->did_the_ship_sink(); 
 }
 
 

@@ -13,10 +13,13 @@ namespace battle_ship
 {
 
 #define SHIP 1
+#define EMPTY 0
+#define SHIP_HIT 2
 #define EMPTY_HIT 3
 #define NUM_OF_SHIPS 6
 #define HORIZONTAL true
 #define VERTICAL false
+
 
 struct RivalShip
 {
@@ -40,6 +43,7 @@ public:
     bool hit(int i);
     int ship_size(int index);
     bool ship_direction(int index);
+    std::pair<int, int> play(Matrix& matrix);
     void place_the_ships_on_board(Matrix& matrix);
 
 private:

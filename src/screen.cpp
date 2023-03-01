@@ -7,6 +7,11 @@ int ship_index = 0;
 bool ship_direction = HORIZONTAL;
 bool mouse_press_on_ship = false;
 bool ships_location_phase = true;
+bool my_turn = true;
+extern int number_of_previous_hits;
+extern std::pair<int, int> hit_point;
+extern bool hit_ship_direction;
+extern bool hit_direction;
 
 namespace impl
 {
@@ -96,7 +101,7 @@ void set_matrix_status(int ship_index, bool direction, ShipManager& ship_manager
 
     for(int i = 0; i < size; ++i)
     {
-        matrix.set_square(x, y, SHIP, ship_index);
+        matrix.set_square(x, y, SHIP, ship_index, direction);
         increase_index(&x, &y, direction);
     }
 
@@ -206,6 +211,11 @@ void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageMana
 void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y)
 {
     int status = matrix.give_status(x, y);
+    if(status == OUTSIDE_MATRIX_RANGE)
+        return;
+
+    my_turn = !my_turn;
+
     if(is_image_not_should_by_set(status))
         return;
 
@@ -223,6 +233,83 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
         matrix.set_status(x, y, EMPTY_HIT);
         images.set_x(matrix.give_x(x, y), matrix.give_y(x, y));
     }
+}
+
+void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival)
+{
+    sleep(1);
+    
+    std::pair<int, int> point = rival.play(matrix);
+    int status = matrix.give_status(point.first, point.second);
+
+
+
+    if(status == SHIP)
+    {
+        ++number_of_previous_hits;
+        if(number_of_previous_hits == 1)
+            hit_point = {point.first, point.second};
+        
+        if(number_of_previous_hits == 2)
+        {
+            if(point.first == hit_point.first)
+            {
+                std::cout << "x == x" << "\n";
+                hit_ship_direction = false;
+                if(point.second > hit_point.second)
+                    hit_direction = true;
+                else
+                    hit_direction = false;
+            }
+            if(point.second == hit_point.second)
+            {
+                std::cout << "y == y" << "\n";
+                hit_ship_direction = true; 
+                if(point.first > hit_point.first)
+                    hit_direction = true;
+                else
+                    hit_direction = false;
+            }
+
+        }
+
+        hit_point = {point.first, point.second};
+        matrix.set_status(point.first, point.second, SHIP_HIT);
+        images.set_fire(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
+
+        int index = matrix.give_ship_index(point.first, point.second);
+        bool direction = matrix.give_direction(point.first, point.second);
+        if(ship_manager.hit(matrix.give_ship_index(point.first, point.second)))
+        {
+            sink_ship(ship_manager.x(index, direction), 
+                      ship_manager.y(index, direction), 
+                      ship_manager.size(index, direction), 
+                      direction, matrix, images);
+            
+            ship_manager.sink_the_ship(index, direction);
+            number_of_previous_hits = 0;
+        }
+    }
+    else
+    {
+        if(number_of_previous_hits > 1)
+        {
+            hit_direction = false;
+            if(hit_ship_direction == HORIZONTAL)
+            {
+                hit_point.first -= (number_of_previous_hits - 1)*SQUARE_SIZE;
+            }
+            else
+            {
+                hit_point.second -= (number_of_previous_hits - 1)*SQUARE_SIZE;
+            }
+        }
+
+        matrix.set_status(point.first, point.second, EMPTY_HIT);
+        images.set_x(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
+    }
+
+    my_turn = !my_turn;
 }
 
 
@@ -259,8 +346,8 @@ void Screen::draw_locate()
 void Screen::draw_game()
 {
     m_background.draw(m_window);
-    m_image_manager.draw(m_window);
     m_ships_manager.draw_located_ships(m_window);
+    m_image_manager.draw(m_window);
 }
 
 void Screen::check_mouse_locate()
@@ -293,7 +380,10 @@ void Screen::check_mouse_game()
     int x = impl::mouse_x_position(m_window);
     int y = impl::mouse_y_position(m_window);
 
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    if(!my_turn)
+        impl::rival_play(m_player_matrix, m_image_manager, m_ships_manager, m_rival);
+
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && my_turn)
         impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y);
 }
 
@@ -334,6 +424,7 @@ void Screen::game_loop()
         m_window.clear();
         draw_game();
         check_mouse_game();
+        draw_game();
         check_events();
         m_window.display();
     }
