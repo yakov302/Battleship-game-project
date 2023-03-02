@@ -8,6 +8,8 @@
 #include <unordered_map>
 
 #include "matrix.hpp"
+#include "logic.hpp"
+
 
 namespace battle_ship
 {
@@ -40,9 +42,12 @@ public:
 
     int x(int i);
     int y(int i);
-    bool hit(int i);
+    bool hit (int i);
+    void empty_hit();
+    void ship_sink();
     int ship_size(int index);
     bool ship_direction(int index);
+    void player_ship_hit(int x, int y);
     std::pair<int, int> play(Matrix& matrix);
     void place_the_ships_on_board(Matrix& matrix);
 
@@ -53,6 +58,8 @@ private:
     RivalShipsMap m_vertical;
     RivalShipsMap m_horizontal;
     RivalShipsMap m_locate_ships;
+
+    Logic m_logic;
 };
 
 

@@ -8,10 +8,6 @@ bool ship_direction = HORIZONTAL;
 bool mouse_press_on_ship = false;
 bool ships_location_phase = true;
 bool my_turn = true;
-extern int number_of_previous_hits;
-extern std::pair<int, int> hit_point;
-extern bool hit_ship_direction;
-extern bool hit_direction;
 
 namespace impl
 {
@@ -242,38 +238,9 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
     std::pair<int, int> point = rival.play(matrix);
     int status = matrix.give_status(point.first, point.second);
 
-
-
     if(status == SHIP)
     {
-        ++number_of_previous_hits;
-        if(number_of_previous_hits == 1)
-            hit_point = {point.first, point.second};
-        
-        if(number_of_previous_hits == 2)
-        {
-            if(point.first == hit_point.first)
-            {
-                std::cout << "x == x" << "\n";
-                hit_ship_direction = false;
-                if(point.second > hit_point.second)
-                    hit_direction = true;
-                else
-                    hit_direction = false;
-            }
-            if(point.second == hit_point.second)
-            {
-                std::cout << "y == y" << "\n";
-                hit_ship_direction = true; 
-                if(point.first > hit_point.first)
-                    hit_direction = true;
-                else
-                    hit_direction = false;
-            }
-
-        }
-
-        hit_point = {point.first, point.second};
+        rival.player_ship_hit(point.first, point.second);
         matrix.set_status(point.first, point.second, SHIP_HIT);
         images.set_fire(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
 
@@ -287,24 +254,12 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
                       direction, matrix, images);
             
             ship_manager.sink_the_ship(index, direction);
-            number_of_previous_hits = 0;
+            rival.ship_sink();
         }
     }
     else
     {
-        if(number_of_previous_hits > 1)
-        {
-            hit_direction = false;
-            if(hit_ship_direction == HORIZONTAL)
-            {
-                hit_point.first -= (number_of_previous_hits - 1)*SQUARE_SIZE;
-            }
-            else
-            {
-                hit_point.second -= (number_of_previous_hits - 1)*SQUARE_SIZE;
-            }
-        }
-
+        rival.empty_hit();
         matrix.set_status(point.first, point.second, EMPTY_HIT);
         images.set_x(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
     }

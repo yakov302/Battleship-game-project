@@ -12,7 +12,7 @@ CXXFLAGS = $(WARNINGS) $(DEBUG) -std=$(CXX_STD) $(LDLIBS)
 CPPFLAGS = -I$(INC_DIR)
 
 TARGET = main
-OBJS = ./main.o ./ship.o ./screen.o ./matrix.o ./ships_manager.o ./image_manager.o ./rival.o
+OBJS = ./main.o ./ship.o ./screen.o ./matrix.o ./ships_manager.o ./image_manager.o ./rival.o ./logic.o
 $(TARGET):$(OBJS)
 
 main.o: main.cpp $(INC_DIR)/screen.hpp 
@@ -36,6 +36,9 @@ ships_manager.o: ships_manager.cpp  $(INC_DIR)/ships_manager.hpp
 image_manager.o: image_manager.cpp  $(INC_DIR)/image_manager.hpp 
 	$(CC) $(CXXFLAGS) -c image_manager.cpp
 
+logic.o: logic.cpp  $(INC_DIR)/logic.hpp 
+	$(CC) $(CXXFLAGS) -c logic.cpp
+	
 vala: $(TARGET)
 	valgrind --log-file=V1.log ./$(TARGET)
 	valgrind --log-file=V2.log --leak-check=full --track-origins=yes ./$(TARGET) 

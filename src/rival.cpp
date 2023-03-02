@@ -233,59 +233,24 @@ bool Rival::hit (int i)
     return false;
 }
 
-std::pair<int, int> pick_close_point(Matrix& matrix)
-{
-    int x = hit_point.first + SQUARE_SIZE;
-    int y = hit_point.second;
-    int status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-
-    x = hit_point.first - 2*SQUARE_SIZE;
-    y = hit_point.second;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-    
-    x = hit_point.first + SQUARE_SIZE;
-    y = hit_point.second + SQUARE_SIZE;;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-
-    x = hit_point.first;
-    y = hit_point.second - 2*SQUARE_SIZE;;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-}
-
 std::pair<int, int> Rival::play(Matrix& matrix)
 {
-    if(number_of_previous_hits < 1)
-        return impl::random_point(matrix);
+    m_logic.play(matrix);
+}
 
-    if(number_of_previous_hits == 1)
-        return impl::pick_close_point(matrix);
+void Rival::empty_hit()
+{
+    m_logic.empty_hit();
+}
 
-    if(hit_ship_direction == HORIZONTAL)
-    {
-        if(hit_direction)
-            return std::pair<int, int>(hit_point.first + SQUARE_SIZE, hit_point.second);
-        else
-            return std::pair<int, int>(hit_point.first - SQUARE_SIZE, hit_point.second);
-    }
-    else
-    {
-         if(hit_direction)
-            return std::pair<int, int>(hit_point.first, hit_point.second  + SQUARE_SIZE);
-        else
-            return std::pair<int, int>(hit_point.first, hit_point.second - SQUARE_SIZE);       
-    }
+void Rival::ship_sink()
+{
+    m_logic.ship_sink();
+}
+
+void Rival::player_ship_hit(int x, int y)
+{
+    m_logic.ship_hit(x, y);
 }
 
 
