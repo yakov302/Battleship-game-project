@@ -224,14 +224,11 @@ void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageMana
 
 void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y, Background& background)
 {
-    my_turn = !my_turn;
-
     int status = matrix.give_status(x, y);
-    if(status == OUTSIDE_MATRIX_RANGE)
-        return;
-
     if(is_image_not_should_by_set(status))
         return;
+
+    my_turn = !my_turn;
 
     if(status == SHIP)
     {
