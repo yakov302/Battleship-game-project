@@ -115,54 +115,6 @@ void check_if_point_valid(int* x, int* y, int size, bool direction, Matrix& matr
     }
 }
 
-std::pair<int, int> random_point(Matrix& matrix)
-{
-    int x = impl::rand_x(X_PLAYER_BASE);
-    int y = impl::rand_y(Y_PLAYER_BASE);
-    int status = matrix.give_status(x, y);
-
-    while (status == SHIP_HIT
-        || status == EMPTY_HIT)
-    {
-        x = impl::rand_x(X_PLAYER_BASE);
-        y = impl::rand_y(Y_PLAYER_BASE);
-        status = matrix.give_status(x, y);
-    }
-    
-    return std::pair<int, int>(x, y);
-}
-
-std::pair<int, int> pick_close_point(Matrix& matrix)
-{
-    int x = hit_point.first + SQUARE_SIZE;
-    int y = hit_point.second;
-    int status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-
-    x = hit_point.first - SQUARE_SIZE;
-    y = hit_point.second;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-    
-    x = hit_point.first;
-    y = hit_point.second + SQUARE_SIZE;;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-
-    x = hit_point.first;
-    y = hit_point.second - SQUARE_SIZE;;
-    status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
-        return std::pair<int, int>(x, y);
-}
-
 
 }//impl namespace
 
@@ -235,7 +187,7 @@ bool Rival::hit (int i)
 
 std::pair<int, int> Rival::play(Matrix& matrix)
 {
-    m_logic.play(matrix);
+    return m_logic.play(matrix);
 }
 
 void Rival::empty_hit()

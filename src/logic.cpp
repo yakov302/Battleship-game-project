@@ -67,6 +67,8 @@ std::pair<int, int> Logic::pick_close_point(Matrix& matrix)
     if(status == EMPTY
     || status == SHIP)
         return std::pair<int, int>(x, y);
+    
+    return std::pair<int, int>(x, y);
 }
 
 std::pair<int, int> Logic::play(Matrix& matrix)

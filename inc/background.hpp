@@ -18,7 +18,7 @@ public:
     , m_change_direction_button("resources/images/change_direction_button.png", 1785, 295, 0.17)
     , m_player("resources/fonts/arial.ttf", "you",  sf::Color(255, 228, 156), 50, 420, 55)
     , m_rival("resources/fonts/arial.ttf", "rival",  sf::Color(255, 228, 156), 50, 1085, 55)
-    , m_message ("resources/fonts/arial.ttf", "",  sf::Color(255, 228, 156), 25, 795, 800)
+    , m_message ("resources/fonts/arial.ttf", "",  sf::Color(255, 228, 156), 25, 1460, 600)
     , m_locate_message("resources/fonts/arial.ttf", "Place the ship on the board",  sf::Color(255, 228, 156), 25, 1460, 300)
     {
 
@@ -48,7 +48,7 @@ public:
     void set_message(std::string message)
     {
         m_message.set_text(message);
-        m_message.set_position(795 - (message.size()*12)/2, 800);
+        m_message.set_position(1645 - (message.size()*12)/2, 450);
     };
     
 private:

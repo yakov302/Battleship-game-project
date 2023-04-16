@@ -4,10 +4,13 @@ namespace battle_ship
 {
 
 int ship_index = 0;
+int num_ship_sunk_player = 0;
+int num_ship_sunk_rival = 0;
 bool ship_direction = HORIZONTAL;
 bool mouse_press_on_ship = false;
 bool ships_location_phase = true;
 bool my_turn = true;
+bool end_game = false;
 
 namespace impl
 {
@@ -130,6 +133,21 @@ bool the_ship_is_next_to_another_ship(int i, bool direction, ShipManager& ship_m
     return false;
 }
 
+void check_end_game(Background& background)
+{
+    if(num_ship_sunk_player == 6)
+    {
+        background.set_message("rival won");
+        end_game = true;
+    }
+
+    if(num_ship_sunk_rival == 6)
+    {
+        background.set_message("you won");
+        end_game = true;
+    }
+}
+
 void invalid_position(std::string message, int i, bool direction, ShipManager& ship_manager, Background& background)
 {
     background.set_message(message);
@@ -204,13 +222,13 @@ void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageMana
     }
 }
 
-void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y)
+void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y, Background& background)
 {
+    my_turn = !my_turn;
+
     int status = matrix.give_status(x, y);
     if(status == OUTSIDE_MATRIX_RANGE)
         return;
-
-    my_turn = !my_turn;
 
     if(is_image_not_should_by_set(status))
         return;
@@ -222,7 +240,11 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
 
         int index = matrix.give_ship_index(x, y);
         if(rival.hit(matrix.give_ship_index(x, y)))
+        {
             sink_ship(rival.x(index), rival.y(index), rival.ship_size(index), rival.ship_direction(index), matrix, images);
+            ++num_ship_sunk_rival;
+            check_end_game(background);
+        }
     }
     else
     {
@@ -231,7 +253,7 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
     }
 }
 
-void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival)
+void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival, Background& background)
 {
     sleep(1);
     
@@ -254,7 +276,9 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
                       direction, matrix, images);
             
             ship_manager.sink_the_ship(index, direction);
+            ++num_ship_sunk_player;
             rival.ship_sink();
+            check_end_game(background);
         }
     }
     else
@@ -336,10 +360,10 @@ void Screen::check_mouse_game()
     int y = impl::mouse_y_position(m_window);
 
     if(!my_turn)
-        impl::rival_play(m_player_matrix, m_image_manager, m_ships_manager, m_rival);
+        impl::rival_play(m_player_matrix, m_image_manager, m_ships_manager, m_rival, m_background);
 
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && my_turn)
-        impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y);
+        impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y, m_background);
 }
 
 void Screen::check_events()
@@ -374,7 +398,7 @@ void Screen::locate_loop()
 
 void Screen::game_loop()
 {
-    while(m_window.isOpen())
+    while(m_window.isOpen() && !end_game)
     {
         m_window.clear();
         draw_game();
@@ -389,6 +413,8 @@ void Screen::run()
 {
     locate_loop();
     game_loop();
+    sleep(5);
+    stop();
 }
 
 
