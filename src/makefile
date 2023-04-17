@@ -12,11 +12,14 @@ CXXFLAGS = $(WARNINGS) $(DEBUG) -std=$(CXX_STD) $(LDLIBS)
 CPPFLAGS = -I$(INC_DIR)
 
 TARGET = main
-OBJS = ./main.o ./ship.o ./screen.o ./matrix.o ./ships_manager.o ./image_manager.o ./rival.o ./logic.o
+OBJS = ./main.o ./ship.o ./screen.o ./matrix.o ./ships_manager.o ./image_manager.o ./rival.o ./logic.o ./sound.o
 $(TARGET):$(OBJS)
 
 main.o: main.cpp $(INC_DIR)/screen.hpp 
 	$(CC) $(CXXFLAGS) -c main.cpp
+
+sound.o: sound.cpp $(INC_DIR)/sound.hpp 
+	$(CC) $(CXXFLAGS) -c sound.cpp
 
 ship.o: ship.cpp $(INC_DIR)/shape.hpp 
 	$(CC) $(CXXFLAGS) -c ship.cpp
@@ -24,7 +27,7 @@ ship.o: ship.cpp $(INC_DIR)/shape.hpp
 rival.o: rival.cpp $(INC_DIR)/rival.hpp 
 	$(CC) $(CXXFLAGS) -c rival.cpp
 
-screen.o: screen.cpp  $(INC_DIR)/ship.hpp  $(INC_DIR)/image_manager.hpp 
+screen.o: screen.cpp  $(INC_DIR)/ship.hpp  $(INC_DIR)/image_manager.hpp $(INC_DIR)/sound.hpp 
 	$(CC) $(CXXFLAGS) -c screen.cpp
 
 matrix.o: matrix.cpp  $(INC_DIR)/matrix.hpp 

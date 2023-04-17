@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "rival.hpp"
+#include "sound.hpp"
 #include "background.hpp"
 #include "ships_manager.hpp"
 #include "image_manager.hpp"
@@ -44,6 +45,7 @@ private:
     sf::Event m_event;
     sf::RenderWindow m_window;
 
+    Sound m_sound;
     Rival m_rival;
     Matrix m_player_matrix;
     Matrix m_rival_matrix;

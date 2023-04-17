@@ -133,16 +133,18 @@ bool the_ship_is_next_to_another_ship(int i, bool direction, ShipManager& ship_m
     return false;
 }
 
-void check_end_game(Background& background)
+void check_end_game(Background& background, Sound& sound)
 {
     if(num_ship_sunk_player == 6)
     {
+        sound.play_fail();
         background.set_message("rival won");
         end_game = true;
     }
 
     if(num_ship_sunk_rival == 6)
     {
+        sound.play_win();
         background.set_message("you won");
         end_game = true;
     }
@@ -154,7 +156,7 @@ void invalid_position(std::string message, int i, bool direction, ShipManager& s
     ship_manager.set_ship_position(i, direction, X_START_POINT - ship_manager.length(i, direction)/2, Y_START_POINT);
 }
 
-void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& matrix, Background& background)
+void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& matrix, Background& background, Sound& sound)
 {
     mouse_press_on_ship = false;
     std::pair<int, int> point = set_point(ship_manager, matrix, i, direction); 
@@ -163,15 +165,18 @@ void set_ship_on_bord(int i, bool direction, ShipManager& ship_manager, Matrix& 
     if(the_ship_is_off_the_grid_board(ship_manager, i, direction))
     {
         invalid_position("Off the board", i, direction, ship_manager, background);
+        sound.play_invalid();
         return;
     }
 
     if(the_ship_is_next_to_another_ship(i, direction, ship_manager, matrix))
     {
         invalid_position("Not allowed near another ship", i, direction, ship_manager, background);
+        sound.play_invalid();
         return;
     }
 
+    sound.play_anchor();
     background.set_message("");
     set_matrix_status(i, direction, ship_manager, matrix);
     ship_manager.locate_ship(ship_index, ship_direction);
@@ -222,43 +227,50 @@ void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageMana
     }
 }
 
-void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y, Background& background)
+void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, int x, int y, Background& background, Sound& sound)
 {
     int status = matrix.give_status(x, y);
     if(is_image_not_should_by_set(status))
+    {
+        sound.play_invalid();
         return;
+    }
 
     my_turn = !my_turn;
 
     if(status == SHIP)
     {
+        sound.play_hit();
         matrix.set_status(x, y, SHIP_HIT);
         images.set_fire(matrix.give_x(x, y), matrix.give_y(x, y));
 
         int index = matrix.give_ship_index(x, y);
         if(rival.hit(matrix.give_ship_index(x, y)))
         {
+            sound.play_sinking();
             sink_ship(rival.x(index), rival.y(index), rival.ship_size(index), rival.ship_direction(index), matrix, images);
             ++num_ship_sunk_rival;
-            check_end_game(background);
+            check_end_game(background, sound);
         }
     }
     else
     {
+        sound.play_empty_hit();
         matrix.set_status(x, y, EMPTY_HIT);
         images.set_x(matrix.give_x(x, y), matrix.give_y(x, y));
     }
 }
 
-void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival, Background& background)
+void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival, Background& background, Sound& sound)
 {
-    sleep(1);
+    sleep(2);
     
     std::pair<int, int> point = rival.play(matrix);
     int status = matrix.give_status(point.first, point.second);
 
     if(status == SHIP)
     {
+        sound.play_hit();
         rival.player_ship_hit(point.first, point.second);
         matrix.set_status(point.first, point.second, SHIP_HIT);
         images.set_fire(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
@@ -267,6 +279,7 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
         bool direction = matrix.give_direction(point.first, point.second);
         if(ship_manager.hit(matrix.give_ship_index(point.first, point.second)))
         {
+            sound.play_sinking();
             sink_ship(ship_manager.x(index, direction), 
                       ship_manager.y(index, direction), 
                       ship_manager.size(index, direction), 
@@ -275,11 +288,12 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
             ship_manager.sink_the_ship(index, direction);
             ++num_ship_sunk_player;
             rival.ship_sink();
-            check_end_game(background);
+            check_end_game(background, sound);
         }
     }
     else
     {
+        sound.play_empty_hit();
         rival.empty_hit();
         matrix.set_status(point.first, point.second, EMPTY_HIT);
         images.set_x(matrix.give_x(point.first, point.second), matrix.give_y(point.first, point.second));
@@ -294,6 +308,7 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
 
 Screen::Screen()
 : m_window(sf::VideoMode::getDesktopMode(), "Battleship")
+, m_sound()
 , m_rival()
 , m_player_matrix(X_PLAYER_BASE, Y_PLAYER_BASE)        
 , m_rival_matrix(X_RIVAL_BASE, Y_RIVAL_BASE)
@@ -336,7 +351,7 @@ void Screen::check_mouse_locate()
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             impl::center_the_ship_on_the_mouse(m_ships_manager, ship_index, ship_direction, x, y);
         else
-            impl::set_ship_on_bord(ship_index, ship_direction, m_ships_manager, m_player_matrix, m_background);
+            impl::set_ship_on_bord(ship_index, ship_direction, m_ships_manager, m_player_matrix, m_background, m_sound);
     }
     else
     {
@@ -346,6 +361,7 @@ void Screen::check_mouse_locate()
 
     if(m_background.is_change_direction_button_pressed(x, y))
     {
+        m_sound.play_button();
         ship_direction = !ship_direction;
         usleep(250000);
     }
@@ -357,10 +373,10 @@ void Screen::check_mouse_game()
     int y = impl::mouse_y_position(m_window);
 
     if(!my_turn)
-        impl::rival_play(m_player_matrix, m_image_manager, m_ships_manager, m_rival, m_background);
+        impl::rival_play(m_player_matrix, m_image_manager, m_ships_manager, m_rival, m_background, m_sound);
 
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && my_turn)
-        impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y, m_background);
+        impl::handle_mouse_pressed(m_rival_matrix, m_image_manager, m_rival, x, y, m_background, m_sound);
 }
 
 void Screen::check_events()

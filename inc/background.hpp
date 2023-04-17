@@ -48,7 +48,7 @@ public:
     void set_message(std::string message)
     {
         m_message.set_text(message);
-        m_message.set_position(1645 - (message.size()*12)/2, 450);
+        m_message.set_position(1645 - (message.size()*12)/2, 230);
     };
     
 private:
