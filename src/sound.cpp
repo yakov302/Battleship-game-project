@@ -19,6 +19,7 @@ void sound_initialization(std::vector<sf::Sound>& a_sounds, std::vector<sf::Soun
     a_sunds_buffers[5].loadFromFile("./resources/sounds/sinking.wav");
     a_sunds_buffers[6].loadFromFile("./resources/sounds/win.wav");
     a_sunds_buffers[7].loadFromFile("./resources/sounds/fail.wav");
+    a_sunds_buffers[8].loadFromFile("./resources/sounds/start.wav");
 
     for(int i = 0; i < NUM_OF_SOUNDS; i++)
     {
@@ -77,6 +78,11 @@ void Sound::play_win()
 void Sound::play_fail()
 {
     m_sounds[7].play();
+}
+
+void Sound::play_start()
+{
+    m_sounds[8].play();
 }
 
 

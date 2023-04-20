@@ -9,6 +9,14 @@ namespace impl
 extern int rand_x(int x_base);
 extern int rand_y(int y_base);
 
+bool point_is_clean(int status)
+{
+    if(status == EMPTY
+    || status == SHIP)
+        return true;
+    return false;
+}
+
 
 }
 
@@ -43,31 +51,28 @@ std::pair<int, int> Logic::pick_close_point(Matrix& matrix)
     int x = m_hit_point.first + SQUARE_SIZE;
     int y = m_hit_point.second;
     int status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
+    if(impl::point_is_clean(status))
         return std::pair<int, int>(x, y);
 
     x = m_hit_point.first - SQUARE_SIZE;
     y = m_hit_point.second;
     status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
+    if(impl::point_is_clean(status))
         return std::pair<int, int>(x, y);
     
     x = m_hit_point.first;
     y = m_hit_point.second + SQUARE_SIZE;;
     status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
+    if(impl::point_is_clean(status))
         return std::pair<int, int>(x, y);
 
     x = m_hit_point.first;
     y = m_hit_point.second - SQUARE_SIZE;;
     status = matrix.give_status(x, y);
-    if(status == EMPTY
-    || status == SHIP)
+    if(impl::point_is_clean(status))
         return std::pair<int, int>(x, y);
     
+    std::cout << "Shouldn't get here" << std::endl;
     return std::pair<int, int>(x, y);
 }
 

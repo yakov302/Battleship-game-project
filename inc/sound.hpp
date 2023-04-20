@@ -5,7 +5,7 @@
 namespace battle_ship
 {
 
-#define NUM_OF_SOUNDS 8
+#define NUM_OF_SOUNDS 9
 
 class Sound
 {
@@ -20,6 +20,8 @@ public:
     void play_sinking();
     void play_win();
     void play_fail();
+    void play_start();
+
 
 private:
     std::vector<sf::Sound> m_sounds;

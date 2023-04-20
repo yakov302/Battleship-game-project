@@ -38,6 +38,9 @@ private:
     void check_events();
     void locate_loop();
     void game_loop();
+    void start();
+    void end();
+    void one_time_draw();
 
 private:
     std::thread* m_thread;
