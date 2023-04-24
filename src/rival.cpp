@@ -195,9 +195,10 @@ void Rival::empty_hit()
     m_logic.empty_hit();
 }
 
-void Rival::ship_sink()
+void Rival::ship_sink(int index)
 {
-    m_logic.ship_sink();
+    int size = m_locate_ships[index].size;
+    m_logic.ship_sink(size);
 }
 
 void Rival::player_ship_hit(int x, int y)

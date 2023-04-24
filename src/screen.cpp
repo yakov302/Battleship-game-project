@@ -285,7 +285,7 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
             
             ship_manager.sink_the_ship(index, direction);
             ++num_ship_sunk_player;
-            rival.ship_sink();
+            rival.ship_sink(index);
             check_end_game();
         }
     }

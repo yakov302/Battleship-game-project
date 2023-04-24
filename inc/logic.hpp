@@ -7,6 +7,8 @@
 namespace battle_ship
 {
 
+#define X true
+#define Y false
 #define SHIP 1
 #define EMPTY 0
 #define SHIP_HIT 2
@@ -15,6 +17,7 @@ namespace battle_ship
 #define VERTICAL false
 #define FORWARD true
 #define BACKWARD false
+#define SHIPS_MAX_SIZE 5
 
 class Logic
 {
@@ -24,13 +27,14 @@ public:
     std::pair<int, int> play(Matrix& matrix);
     void ship_hit(int x, int y);
     void empty_hit();
-    void ship_sink();
+    void ship_sink(int size);
 
 private:
-    std::pair<int, int> random_point(Matrix& matrix);
+    std::pair<int, int> random_point(Matrix& matrix, int* ships_sizes);
     std::pair<int, int> pick_close_point(Matrix& matrix);
 
 private:
+    int m_ships_sizes[SHIPS_MAX_SIZE];
     std::pair<int, int> m_hit_point;
 
     int m_number_of_hits;

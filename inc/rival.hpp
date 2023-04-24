@@ -44,7 +44,7 @@ public:
     int y(int i);
     bool hit (int i);
     void empty_hit();
-    void ship_sink();
+    void ship_sink(int index);
     int ship_size(int index);
     bool ship_direction(int index);
     void player_ship_hit(int x, int y);
