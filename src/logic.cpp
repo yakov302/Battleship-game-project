@@ -246,6 +246,71 @@ std::pair<int, int> Logic::pick_close_point(Matrix& matrix)
     return std::pair<int, int>(x, y);
 }
 
+std::pair<int, int> Logic::pick_next_point_horizontal(Matrix& matrix)
+{
+    if(m_hit_play_direction == FORWARD)
+    {
+        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first + SQUARE_SIZE, m_hit_point.second, HORIZONTAL))
+        {
+            return std::pair<int, int>(m_hit_point.first + SQUARE_SIZE, m_hit_point.second);
+        }
+        else
+        {
+            std::cout << "new update1" << "\n";
+            m_hit_play_direction = BACKWARD;  
+            m_hit_point.first -= (m_number_of_hits)*SQUARE_SIZE;
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
+        }
+    }
+    else
+    {
+        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first - SQUARE_SIZE, m_hit_point.second, HORIZONTAL))
+        {
+            return std::pair<int, int>(m_hit_point.first - SQUARE_SIZE, m_hit_point.second);
+        }
+        else
+        {
+            std::cout << "new update2" << "\n";
+            m_hit_play_direction = FORWARD;  
+            m_hit_point.first += (m_number_of_hits)*SQUARE_SIZE;
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
+
+        }
+    }
+}
+
+std::pair<int, int> Logic::pick_next_point_vertical(Matrix& matrix)
+{
+    if(m_hit_play_direction == FORWARD)
+    {
+        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first, m_hit_point.second + SQUARE_SIZE, VERTICAL))
+        {
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second + SQUARE_SIZE);
+        }
+        else
+        {
+            std::cout << "new update3" << "\n";
+            m_hit_play_direction = BACKWARD;  
+            m_hit_point.second -= (m_number_of_hits)*SQUARE_SIZE;
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
+        }
+    }
+    else
+    {
+        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first, m_hit_point.second - SQUARE_SIZE, VERTICAL))
+        {
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second - SQUARE_SIZE);
+        }
+        else
+        {
+            std::cout << "new update4" << "\n";
+            m_hit_play_direction = FORWARD;  
+            m_hit_point.second += (m_number_of_hits)*SQUARE_SIZE;
+            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
+        }
+    }
+}
+
 std::pair<int, int> Logic::play(Matrix& matrix)
 {
     if(m_number_of_hits < 1)
@@ -255,19 +320,9 @@ std::pair<int, int> Logic::play(Matrix& matrix)
         return pick_close_point(matrix);
 
     if(m_hit_ship_direction == HORIZONTAL)
-    {
-        if(m_hit_play_direction == FORWARD)
-            return std::pair<int, int>(m_hit_point.first + SQUARE_SIZE, m_hit_point.second);
-        else
-            return std::pair<int, int>(m_hit_point.first - SQUARE_SIZE, m_hit_point.second);
-    }
+        return pick_next_point_horizontal(matrix);
     else
-    {
-         if(m_hit_play_direction == FORWARD)
-            return std::pair<int, int>(m_hit_point.first, m_hit_point.second  + SQUARE_SIZE);
-        else
-            return std::pair<int, int>(m_hit_point.first, m_hit_point.second - SQUARE_SIZE);       
-    }
+        return pick_next_point_vertical(matrix);
 }
 
 void Logic::ship_hit(int x, int y)
@@ -321,4 +376,4 @@ void Logic::ship_sink(int size)
 }
 
 
-}//battle_ship namespace
+} // battle_ship namespace

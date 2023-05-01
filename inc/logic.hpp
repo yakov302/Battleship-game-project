@@ -31,6 +31,8 @@ public:
 
 private:
     std::pair<int, int> random_point(Matrix& matrix, int* ships_sizes);
+    std::pair<int, int> pick_next_point_horizontal(Matrix& matrix);
+    std::pair<int, int> pick_next_point_vertical(Matrix& matrix);
     std::pair<int, int> pick_close_point(Matrix& matrix);
 
 private:

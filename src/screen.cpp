@@ -261,6 +261,7 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
 
 void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival, Sound& sound, Background& background)
 {
+    std::cout << "----------------------------------rival_play start\n";
     sleep(1);
     
     std::pair<int, int> point = rival.play(matrix);
@@ -298,6 +299,9 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
     }
 
     handle_turn(background);
+
+    std::cout << "----------------------------------rival_play end\n";
+
 }
 
 
