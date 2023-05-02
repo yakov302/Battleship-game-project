@@ -1,6 +1,6 @@
 # Battleship-game-project
+Full implementation of Battleship game with SFML graphics and sounds and sophisticated computerized logic.
 
-  
 ### Requirements
    - C++ compiler
    - linux (ubuntu) virtualization (GUI) enable.
