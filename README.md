@@ -7,7 +7,7 @@
    -  Installing SFML library - https://www.sfml-dev.org/tutorials/2.5/start-linux.php.
   
   
-### Run the application   
+### Run the game   
    * go to directory - Battleship-game-project/src
    * run command:
 ```bash
