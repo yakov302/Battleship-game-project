@@ -1,5 +1,5 @@
 # Battleship-game-project
-Full implementation of Battleship game with SFML graphics and sounds and sophisticated computerized logic.
+Full implementation of Battleship game with High-leve SFML graphics and sounds and sophisticated computerized logic.
 
 ### Requirements
    - C++ compiler
