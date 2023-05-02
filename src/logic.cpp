@@ -20,7 +20,7 @@ int give_me_smallest_ships_size(int* ships_sizes)
     return 4;
 }
 
-bool positive_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
+bool positive_random_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
 {
     int status;
 
@@ -32,17 +32,13 @@ bool positive_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, boo
             status = matrix.give_status(x, y + SQUARE_SIZE*(i + 1));
 
         if(status == SHIP_HIT || status == EMPTY_HIT || status == OUTSIDE_MATRIX_RANGE)
-        {
-            std::cout << "positive_loop return false \n";
             return false;
-        }
     }  
 
-    std::cout << "positive_loop return true \n";
     return true;
 }
 
-bool negative_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
+bool negative_random_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
 {
     int status;
     int squares = 1;
@@ -55,38 +51,31 @@ bool negative_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, boo
             status = matrix.give_status(x, y - SQUARE_SIZE*(squares));
 
         if(status == SHIP_HIT || status == EMPTY_HIT || status == OUTSIDE_MATRIX_RANGE)
-        {
-            std::cout << "negative_loop return false \n";
             return false;
-        }
 
         ++squares;
     }
 
-    std::cout << "negative_loop return true \n";
     return true;
 }
 
-bool is_the_poin_valid(Matrix& matrix, int* ships_sizes, int x, int y)
+bool is_random_poin_makes_sense(Matrix& matrix, int* ships_sizes, int x, int y)
 {
-    std::cout << "is_the_poin_valid \n";
     int the_smallest_ship_size = give_me_smallest_ships_size(ships_sizes);
-    std::cout << "the_smallest_ship_size:" << the_smallest_ship_size << "\n";
 
-    if(positive_loop(matrix, the_smallest_ship_size, x, y, X))
+    if(positive_random_loop(matrix, the_smallest_ship_size, x, y, X))
         return true;
-    if(positive_loop(matrix, the_smallest_ship_size, x, y, Y))
+    if(positive_random_loop(matrix, the_smallest_ship_size, x, y, Y))
         return true;
-    if(negative_loop(matrix, the_smallest_ship_size, x, y, X))
+    if(negative_random_loop(matrix, the_smallest_ship_size, x, y, X))
         return true;
-    if(negative_loop(matrix, the_smallest_ship_size, x, y, Y))
+    if(negative_random_loop(matrix, the_smallest_ship_size, x, y, Y))
         return true;
 
-    std::cout << "is_the_poin_valid return false \n";
     return false;
 }
 
-int pos_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
+int positive_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
 {
     int status;
     int counter = 0;
@@ -107,7 +96,7 @@ int pos_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or
     return counter;
 }
 
-int neg_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
+int negative_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or_y)
 {
     int status;
     int counter = 0;
@@ -130,64 +119,46 @@ int neg_loop(Matrix& matrix, int the_smallest_ship_size, int x, int y, bool x_or
     return counter;
 }
 
-bool is_the_poin_ok(Matrix& matrix, int* ships_sizes, int x, int y, bool direction)
+bool is_the_poin_makes_sense(Matrix& matrix, int* ships_sizes, int x, int y, bool direction)
 {
-    std::cout << "is_the_poin_ok start\n";
     int the_smallest_ship_size = give_me_smallest_ships_size(ships_sizes);
-    std::cout << "the_smallest_ship_size:" << the_smallest_ship_size << "\n";
 
     if(direction == HORIZONTAL)
     {
-        std::cout << "direction == HORIZONTAL \n";
-        int right = pos_loop(matrix, the_smallest_ship_size, x, y, X);
-        int left = neg_loop(matrix, the_smallest_ship_size, x, y, X);
-        std::cout << "right + left + 1 = " << (right + left + 1) << "\n";
+        int right = positive_loop(matrix, the_smallest_ship_size, x, y, X);
+        int left = negative_loop(matrix, the_smallest_ship_size, x, y, X);
         if(right + left + 1 >= the_smallest_ship_size)
-        {
-            std::cout << "is_the_poin_ok return true\n";
             return true;
-        }
     }
     else
     {
-        std::cout << "direction == VERTICAL \n";
-        int right = pos_loop(matrix, the_smallest_ship_size, x, y, Y);
-        int left = neg_loop(matrix, the_smallest_ship_size, x, y, Y);
-        std::cout << "right + left + 1 = " << (right + left + 1) << "\n";
+        int right = positive_loop(matrix, the_smallest_ship_size, x, y, Y);
+        int left = negative_loop(matrix, the_smallest_ship_size, x, y, Y);
         if(right + left + 1 >= the_smallest_ship_size)
-        {
-            std::cout << "is_the_poin_ok return true\n";
             return true;
-        }
     }
 
-    std::cout << "is_the_poin_ok return false\n";
     return false;
 }
-bool point_is_good(Matrix& matrix, int* ships_sizes, int x, int y, bool direction)
+
+bool is_close_point_is_good(Matrix& matrix, int* ships_sizes, int x, int y, bool direction)
 {
-    std::cout << "point_is_good start\n";
     int status = matrix.give_status(x, y);
-    if((status == EMPTY
-    || status == SHIP)
-    && is_the_poin_ok(matrix, ships_sizes, x, y, direction))
-    {
-        std::cout << "point_is_good return true\n";
+    if((status == EMPTY || status == SHIP)
+    && is_the_poin_makes_sense(matrix, ships_sizes, x, y, direction))
         return true;
-    }
 
-    std::cout << "point_is_good return false\n";
     return false;
 }
 
-void set_ships_default_status(int* ships_sizes)
+void set_ships_sizes_start_status(int* ships_sizes)
 {
-        for(int i = 0; i < SHIPS_MAX_SIZE; ++i)
-            ships_sizes[i] = 0;
+    for(int i = 0; i < SHIPS_MAX_SIZE; ++i)
+        ships_sizes[i] = 0;
 
-        ships_sizes[2] = 1;
-        ships_sizes[3] = 3;
-        ships_sizes[4] = 2;
+    ships_sizes[2] = 1;
+    ships_sizes[3] = 3;
+    ships_sizes[4] = 2;
 }
 
 
@@ -199,7 +170,7 @@ Logic::Logic()
 , m_hit_ship_direction(true)
 , m_hit_play_direction(true)
 {
-    impl::set_ships_default_status(m_ships_sizes);
+    impl::set_ships_sizes_start_status(m_ships_sizes);
 }
 
 std::pair<int, int> Logic::random_point(Matrix& matrix, int* ships_sizes)
@@ -210,7 +181,7 @@ std::pair<int, int> Logic::random_point(Matrix& matrix, int* ships_sizes)
 
     while (status == SHIP_HIT
         || status == EMPTY_HIT
-        || !impl::is_the_poin_valid(matrix, ships_sizes, x, y))
+        || !impl::is_random_poin_makes_sense(matrix, ships_sizes, x, y))
     {
         x = impl::rand_x(X_PLAYER_BASE);
         y = impl::rand_y(Y_PLAYER_BASE);
@@ -224,25 +195,24 @@ std::pair<int, int> Logic::pick_close_point(Matrix& matrix)
 {
     int x = m_hit_point.first + SQUARE_SIZE;
     int y = m_hit_point.second;
-    if(impl::point_is_good(matrix, m_ships_sizes, x, y, HORIZONTAL))
+    if(impl::is_close_point_is_good(matrix, m_ships_sizes, x, y, HORIZONTAL))
         return std::pair<int, int>(x, y);
 
     x = m_hit_point.first - SQUARE_SIZE;
     y = m_hit_point.second;
-    if(impl::point_is_good(matrix, m_ships_sizes, x, y, HORIZONTAL))
+    if(impl::is_close_point_is_good(matrix, m_ships_sizes, x, y, HORIZONTAL))
         return std::pair<int, int>(x, y);
     
     x = m_hit_point.first;
     y = m_hit_point.second + SQUARE_SIZE;;
-    if(impl::point_is_good(matrix, m_ships_sizes, x, y, VERTICAL))
+    if(impl::is_close_point_is_good(matrix, m_ships_sizes, x, y, VERTICAL))
         return std::pair<int, int>(x, y);
 
     x = m_hit_point.first;
     y = m_hit_point.second - SQUARE_SIZE;;
-    if(impl::point_is_good(matrix, m_ships_sizes, x, y, VERTICAL))
+    if(impl::is_close_point_is_good(matrix, m_ships_sizes, x, y, VERTICAL))
         return std::pair<int, int>(x, y);
     
-    std::cout << "Shouldn't get here" << std::endl;
     return std::pair<int, int>(x, y);
 }
 
@@ -250,65 +220,38 @@ std::pair<int, int> Logic::pick_next_point_horizontal(Matrix& matrix)
 {
     if(m_hit_play_direction == FORWARD)
     {
-        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first + SQUARE_SIZE, m_hit_point.second, HORIZONTAL))
+        if(impl::is_close_point_is_good(matrix, m_ships_sizes, m_hit_point.first + SQUARE_SIZE, m_hit_point.second, HORIZONTAL))
         {
             return std::pair<int, int>(m_hit_point.first + SQUARE_SIZE, m_hit_point.second);
         }
         else
         {
-            std::cout << "new update1" << "\n";
             m_hit_play_direction = BACKWARD;  
-            m_hit_point.first -= (m_number_of_hits)*SQUARE_SIZE;
+            m_hit_point.first -= m_number_of_hits*SQUARE_SIZE;
             return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
         }
     }
-    else
-    {
-        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first - SQUARE_SIZE, m_hit_point.second, HORIZONTAL))
-        {
-            return std::pair<int, int>(m_hit_point.first - SQUARE_SIZE, m_hit_point.second);
-        }
-        else
-        {
-            std::cout << "new update2" << "\n";
-            m_hit_play_direction = FORWARD;  
-            m_hit_point.first += (m_number_of_hits)*SQUARE_SIZE;
-            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
 
-        }
-    }
+    return std::pair<int, int>(m_hit_point.first - SQUARE_SIZE, m_hit_point.second);
 }
 
 std::pair<int, int> Logic::pick_next_point_vertical(Matrix& matrix)
 {
     if(m_hit_play_direction == FORWARD)
     {
-        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first, m_hit_point.second + SQUARE_SIZE, VERTICAL))
+        if(impl::is_close_point_is_good(matrix, m_ships_sizes, m_hit_point.first, m_hit_point.second + SQUARE_SIZE, VERTICAL))
         {
             return std::pair<int, int>(m_hit_point.first, m_hit_point.second + SQUARE_SIZE);
         }
         else
         {
-            std::cout << "new update3" << "\n";
             m_hit_play_direction = BACKWARD;  
-            m_hit_point.second -= (m_number_of_hits)*SQUARE_SIZE;
+            m_hit_point.second -= m_number_of_hits*SQUARE_SIZE;
             return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
         }
     }
-    else
-    {
-        if(impl::point_is_good(matrix, m_ships_sizes, m_hit_point.first, m_hit_point.second - SQUARE_SIZE, VERTICAL))
-        {
-            return std::pair<int, int>(m_hit_point.first, m_hit_point.second - SQUARE_SIZE);
-        }
-        else
-        {
-            std::cout << "new update4" << "\n";
-            m_hit_play_direction = FORWARD;  
-            m_hit_point.second += (m_number_of_hits)*SQUARE_SIZE;
-            return std::pair<int, int>(m_hit_point.first, m_hit_point.second);
-        }
-    }
+
+    return std::pair<int, int>(m_hit_point.first, m_hit_point.second - SQUARE_SIZE);
 }
 
 std::pair<int, int> Logic::play(Matrix& matrix)

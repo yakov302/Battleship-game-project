@@ -1,0 +1,9 @@
+./resources/sounds/invalid.wav
+./resources/sounds/anchor.wav
+./resources/sounds/button.wav
+./resources/sounds/empty_hit.wav
+./resources/sounds/hit.wav
+./resources/sounds/sinking.wav
+./resources/sounds/win.wav
+./resources/sounds/fail.wav
+./resources/sounds/start.wav

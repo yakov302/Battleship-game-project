@@ -28,22 +28,19 @@ void init_matrix(Square* buffer, int x_base, int y_base)
 int is_index_inside_matrix_range(int index)
 {
     if(index >= NUM_OF_POINTS || index < 0)
-    {
-        //std::cout << "MATRIX ERROR: out of range!\n";
         return false;
-    }
     
     return true;
 }
 
 int is_point_inside_matrix_range(int x, int y, int x_base, int y_base)
 {
-    if(x < x_base || y <  y_base || x > x_base + SQUARE_SIZE*NUM_OF_COLUMNS || y > y_base + SQUARE_SIZE*NUM_OF_COLUMNS)
-    {
-        //std::cout << "MATRIX ERROR: out of range!\n";
+    if(x < x_base 
+    || y < y_base 
+    || x > x_base + SQUARE_SIZE*NUM_OF_COLUMNS 
+    || y > y_base + SQUARE_SIZE*NUM_OF_COLUMNS)
         return false;
-    }
-    
+ 
     return true;
 }
 
@@ -152,7 +149,7 @@ int Matrix::give_index(int x, int y)
     return OUTSIDE_MATRIX_RANGE; //Shouldn't get here
 }
 
-std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix)
+std::ostream& operator<<(std::ostream& a_os, Matrix const& matrix) // for debug
 {
     for(int i = 0; i < NUM_OF_COLUMNS; ++i)
     {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility>
-
 #include "matrix.hpp"
 
 namespace battle_ship
@@ -10,7 +8,6 @@ namespace battle_ship
 #define X true
 #define Y false
 #define SHIP 1
-#define EMPTY 0
 #define SHIP_HIT 2
 #define EMPTY_HIT 3
 #define HORIZONTAL true
@@ -26,8 +23,8 @@ public:
 
     std::pair<int, int> play(Matrix& matrix);
     void ship_hit(int x, int y);
-    void empty_hit();
     void ship_sink(int size);
+    void empty_hit();
 
 private:
     std::pair<int, int> random_point(Matrix& matrix, int* ships_sizes);

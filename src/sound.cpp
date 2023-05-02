@@ -6,25 +6,17 @@ namespace battle_ship
 namespace impl
 {
 
-void sound_initialization(std::vector<sf::Sound>& a_sounds, std::vector<sf::SoundBuffer>& a_sunds_buffers)
+void sound_initialization(std::vector<sf::Sound>& a_sounds, std::vector<sf::SoundBuffer>& a_sunds_buffers, std::ifstream& config_file)
 {
-    for(int i = 0; i < NUM_OF_SOUNDS; i++)
+    int i = 0;
+    std::string sound_file_name;    
+    while(std::getline(config_file, sound_file_name))
+    {   
         a_sunds_buffers.emplace_back(sf::SoundBuffer());
-
-    a_sunds_buffers[0].loadFromFile("./resources/sounds/invalid.wav");
-    a_sunds_buffers[1].loadFromFile("./resources/sounds/anchor.wav");
-    a_sunds_buffers[2].loadFromFile("./resources/sounds/button.wav");
-    a_sunds_buffers[3].loadFromFile("./resources/sounds/empty_hit.wav");
-    a_sunds_buffers[4].loadFromFile("./resources/sounds/hit.wav");
-    a_sunds_buffers[5].loadFromFile("./resources/sounds/sinking.wav");
-    a_sunds_buffers[6].loadFromFile("./resources/sounds/win.wav");
-    a_sunds_buffers[7].loadFromFile("./resources/sounds/fail.wav");
-    a_sunds_buffers[8].loadFromFile("./resources/sounds/start.wav");
-
-    for(int i = 0; i < NUM_OF_SOUNDS; i++)
-    {
+        a_sunds_buffers[i].loadFromFile(sound_file_name);
         a_sounds.emplace_back(sf::Sound());
         a_sounds[i].setBuffer(a_sunds_buffers[i]);
+        ++i;    
     }
 }
 
@@ -37,7 +29,8 @@ Sound::Sound()
 {
     m_sounds.reserve(NUM_OF_SOUNDS);
     m_sunds_buffers.reserve(NUM_OF_SOUNDS);
-    impl::sound_initialization(m_sounds, m_sunds_buffers);
+    std::ifstream sound_config_file("./resources/txt/sounds_config.txt");
+    impl::sound_initialization(m_sounds, m_sunds_buffers, sound_config_file);
 }
 
 void Sound::play_invalid()

@@ -8,7 +8,6 @@ int num_ship_sunk_player = 0;
 int num_ship_sunk_rival = 0;
 bool ship_direction = HORIZONTAL;
 bool mouse_press_on_ship = false;
-bool ships_location_phase = true;
 bool my_turn = true;
 bool end_game = false;
 
@@ -103,7 +102,6 @@ void set_matrix_status(int ship_index, bool direction, ShipManager& ship_manager
         matrix.set_square(x, y, SHIP, ship_index, direction);
         increase_index(&x, &y, direction);
     }
-
 }
 
 bool there_is_close_ship(int x, int y,  Matrix& matrix)
@@ -180,7 +178,7 @@ bool is_image_not_should_by_set(int status)
         || status == EMPTY_HIT);
 }
 
-void place_x(Matrix& matrix, ImageManager& images, int x, int y)
+void place_x_image(Matrix& matrix, ImageManager& images, int x, int y)
 {
     if(matrix.give_status(x + SQUARE_SIZE, y) == EMPTY)
     {
@@ -211,7 +209,7 @@ void sink_ship(int x, int y, int size, bool direction, Matrix& matrix, ImageMana
 {
     for(int i = 0; i < size; ++i)
     {
-        impl::place_x(matrix, images, x, y);
+        impl::place_x_image(matrix, images, x, y);
         impl::increase_index(&x, &y, direction);
     }
 }
@@ -243,7 +241,7 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
         images.set_fire(matrix.give_x(x, y), matrix.give_y(x, y));
 
         int index = matrix.give_ship_index(x, y);
-        if(rival.hit(matrix.give_ship_index(x, y)))
+        if(rival.hit(index))
         {
             sound.play_sinking();
             sink_ship(rival.x(index), rival.y(index), rival.ship_size(index), rival.ship_direction(index), matrix, images);
@@ -261,7 +259,6 @@ void handle_mouse_pressed(Matrix& matrix, ImageManager& images, Rival& rival, in
 
 void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager, Rival& rival, Sound& sound, Background& background)
 {
-    std::cout << "----------------------------------rival_play start\n";
     sleep(1);
     
     std::pair<int, int> point = rival.play(matrix);
@@ -276,7 +273,7 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
 
         int index = matrix.give_ship_index(point.first, point.second);
         bool direction = matrix.give_direction(point.first, point.second);
-        if(ship_manager.hit(matrix.give_ship_index(point.first, point.second)))
+        if(ship_manager.hit(index))
         {
             sound.play_sinking();
             sink_ship(ship_manager.x(index, direction), 
@@ -284,7 +281,6 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
                       ship_manager.size(index, direction), 
                       direction, matrix, images);
             
-            ship_manager.sink_the_ship(index, direction);
             ++num_ship_sunk_player;
             rival.ship_sink(index);
             check_end_game();
@@ -299,9 +295,6 @@ void rival_play(Matrix& matrix, ImageManager& images, ShipManager& ship_manager,
     }
 
     handle_turn(background);
-
-    std::cout << "----------------------------------rival_play end\n";
-
 }
 
 
@@ -331,14 +324,14 @@ void Screen::stop()
 
 void Screen::draw_locate()
 {
-    m_background.draw(m_window);
+    m_background.draw_ships_location_phase(m_window);
     m_ships_manager.draw_located_ships(m_window);
     m_ships_manager.draw_ship(ship_index, ship_direction, m_window);
 }
 
 void Screen::draw_game()
 {
-    m_background.draw(m_window);
+    m_background.draw_game_phase(m_window);
     m_ships_manager.draw_located_ships(m_window);
     m_image_manager.draw(m_window);
 }
@@ -408,7 +401,6 @@ void Screen::locate_loop()
     }
 
     m_rival.place_the_ships_on_board(m_rival_matrix);
-    ships_location_phase = false;
 }
 
 void Screen::game_loop()

@@ -1,5 +1,4 @@
 #include "../inc/image_manager.hpp"
-#include <iostream>
 
 namespace battle_ship
 {

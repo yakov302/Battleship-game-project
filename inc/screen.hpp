@@ -1,9 +1,7 @@
 #pragma once
 
 #include <thread>
-#include <iostream>
 #include <unistd.h>
-#include <utility>
 #include <SFML/Graphics.hpp>
 
 #include "rival.hpp"
@@ -16,10 +14,6 @@ namespace battle_ship
 {
 
 #define GAP 1
-#define SHIP 1
-#define EMPTY 0
-#define SHIP_HIT 2
-#define EMPTY_HIT 3
 
 class Screen
 {
@@ -31,6 +25,7 @@ public:
     void stop();
 
 private:
+    void one_time_draw();
     void draw_locate();
     void draw_game();
     void check_mouse_locate();
@@ -40,7 +35,6 @@ private:
     void game_loop();
     void start();
     void end();
-    void one_time_draw();
 
 private:
     std::thread* m_thread;

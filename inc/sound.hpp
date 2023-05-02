@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <SFML/Audio.hpp>
 
 namespace battle_ship
@@ -21,7 +22,6 @@ public:
     void play_win();
     void play_fail();
     void play_start();
-
 
 private:
     std::vector<sf::Sound> m_sounds;

@@ -1,27 +1,15 @@
 #pragma once
 
 #include <random>
-#include <vector>
 #include <fstream>
-#include <iostream>
-#include <unistd.h>
 #include <unordered_map>
 
-#include "matrix.hpp"
 #include "logic.hpp"
-
 
 namespace battle_ship
 {
 
-#define SHIP 1
-#define EMPTY 0
-#define SHIP_HIT 2
-#define EMPTY_HIT 3
 #define NUM_OF_SHIPS 6
-#define HORIZONTAL true
-#define VERTICAL false
-
 
 struct RivalShip
 {

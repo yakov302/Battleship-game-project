@@ -6,10 +6,6 @@ namespace battle_ship
 std::random_device seed;    
 static std::mt19937_64 seed_engine(seed());
 std::uniform_int_distribution<int> distribution;
-int number_of_previous_hits = 0;
-std::pair<int, int> hit_point;
-bool hit_ship_direction;
-bool hit_direction = true;
 
 namespace impl
 {
@@ -197,8 +193,7 @@ void Rival::empty_hit()
 
 void Rival::ship_sink(int index)
 {
-    int size = m_locate_ships[index].size;
-    m_logic.ship_sink(size);
+    m_logic.ship_sink(m_locate_ships[index].size);
 }
 
 void Rival::player_ship_hit(int x, int y)

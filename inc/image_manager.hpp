@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <unistd.h>
 
 #include "image.hpp"
 
