@@ -37,7 +37,7 @@ bool Ship::direction()
 void Ship::draw(sf::RenderWindow& a_window)const
 {
     m_image.draw(a_window);
-}; 
+}
 
 bool Ship::is_in_range(int x, int y)
 {
