@@ -405,6 +405,9 @@ void Screen::locate_loop()
 
 void Screen::game_loop()
 {
+    if(!m_window.isOpen())
+        return;
+
     while(m_window.isOpen() && !end_game)
     {
         m_window.clear();
@@ -425,6 +428,9 @@ void Screen::one_time_draw()
 
 void Screen::start()
 {
+    if(!m_window.isOpen())
+        return;
+
     one_time_draw();
     sleep(1);
 
@@ -434,6 +440,9 @@ void Screen::start()
 
 void Screen::end()
 {
+    if(!m_window.isOpen())
+        return;
+        
     m_background.set_message("");
     one_time_draw();
     sleep(3);
